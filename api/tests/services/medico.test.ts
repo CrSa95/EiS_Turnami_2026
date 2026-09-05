@@ -1,14 +1,18 @@
-import { jest, describe, it, beforeEach } from "@jest/globals";
-import AuthService from "../../src/services/auth";
-import MedicoDAO from "../../src/dao/medico";
-import assert from "node:assert/strict";
-import { PasswordService } from "../../src/services/passwordServices";
-import { IMedico } from "../../src/model/medico.js";
 import { Types } from "mongoose";
+import assert from "node:assert/strict";
+import { jest, describe, it, beforeEach } from "@jest/globals";
 
-describe("AuthServices", () => {
+import PasswordService from "../../src/services/password.services";
+import MedicoServices from "../../src/services/medico.services";
+import MedicoDAO from "../../src/dao/medico.dao";
+
+
+import { IMedico } from "../../src/model/medico.model.js";
+
+
+describe("MedicoService", () => {
     let mockMedicoDAO: jest.Mocked<MedicoDAO>;
-    let authServices: AuthService;
+    let medicoServices: MedicoServices;
 
     beforeEach(async () => {
         // Mock manual del DAO
@@ -16,7 +20,7 @@ describe("AuthServices", () => {
             findByEmail: jest.fn(),
         } as unknown as jest.Mocked<MedicoDAO>;
 
-        authServices = new AuthService(mockMedicoDAO);
+        medicoServices = new MedicoServices(mockMedicoDAO);
     });
 
     describe("#login", () => {
@@ -40,7 +44,7 @@ describe("AuthServices", () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock);
             await assert.rejects(
                 async () => {
-                    await authServices.login(medicoLogin.email, "zaraza");
+                    await medicoServices.login(medicoLogin.email, "zaraza");
                 },
                 {
                     message: "Error al iniciar sesión, intente nuevamente",
@@ -52,7 +56,7 @@ describe("AuthServices", () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(null);
             await assert.rejects(
                 async () => {
-                    await authServices.login(
+                    await medicoServices.login(
                         "fake@correo.com",
                         medicoLogin.password,
                     );
@@ -66,7 +70,7 @@ describe("AuthServices", () => {
 
         it("correo y contraseña correcto devuelve un token", async () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock)
-            let { access_token, user } = await authServices.login(medicoLogin.email, medicoLogin.password)
+            let { access_token, user } = await medicoServices.login(medicoLogin.email, medicoLogin.password)
 
             expect(access_token).toBeDefined();
             expect(user.email).toBe(medicoLogin.email);
