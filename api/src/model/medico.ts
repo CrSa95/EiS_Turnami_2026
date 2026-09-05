@@ -1,6 +1,6 @@
-import { Schema, model, Document} from 'mongoose';
+import { Schema, model} from 'mongoose';
 
-export interface IMedico extends Document {
+export interface IMedico {
     email: string;
     password: string;
 }
