@@ -1,6 +1,7 @@
-import { Schema, model} from 'mongoose';
+import { Schema, model, Types} from 'mongoose';
 
 export interface IMedico {
+    _id?: Types.ObjectId | string;
     email: string;
     password: string;
 }

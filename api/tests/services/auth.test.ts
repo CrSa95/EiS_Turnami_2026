@@ -4,6 +4,7 @@ import MedicoDAO from "../../src/dao/medico";
 import assert from "node:assert/strict";
 import { PasswordService } from "../../src/services/passwordServices";
 import { IMedico } from "../../src/model/medico.js";
+import { Types } from "mongoose";
 
 describe("AuthServices", () => {
     let mockMedicoDAO: jest.Mocked<MedicoDAO>;
@@ -23,15 +24,19 @@ describe("AuthServices", () => {
             email: "test@medico.com",
             password: "contraseñaEjemplo",
         };
+        let medicoMock: IMedico
+
+        beforeAll(async () => {
+            medicoMock = {
+                _id: new Types.ObjectId(),
+                email: medicoLogin.email,
+                password: await PasswordService.hash(medicoLogin.password)
+            };
+        })
+
 
         it('contraseña incorrecta lanza error con el mensaje "Error al iniciar sesión, intente nuevamente" ', async () => {
-            const hashedPassword = await PasswordService.hash(
-                medicoLogin.password,
-            );
-            const medicoMock: IMedico = {
-                email: medicoLogin.email,
-                password: hashedPassword,
-            };
+
             mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock);
             await assert.rejects(
                 async () => {
@@ -57,5 +62,15 @@ describe("AuthServices", () => {
                 },
             );
         });
+
+
+        it("correo y contraseña correcto devuelve un token", async () => {
+            mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock)
+            let { access_token, user } = await authServices.login(medicoLogin.email, medicoLogin.password)
+
+            expect(access_token).toBeDefined();
+            expect(user.email).toBe(medicoLogin.email);
+            expect(user.id).toEqual(medicoMock._id);
+        })
     });
 });
