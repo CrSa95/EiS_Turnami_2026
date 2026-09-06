@@ -21,7 +21,7 @@ export default class MedicoServices {
     }
     async login(dni: string, password: string): Promise<TokenResponseMedico>{
 
-        let medico: IMedico | null = await this.medicoDAO.findByEmail(dni)
+        let medico: IMedico | null = await this.medicoDAO.findByDNI(dni)
         if(!medico){
             throw new Error("Usted no se encuentra registrado")
         }
@@ -58,7 +58,7 @@ export default class MedicoServices {
                 return false;
             }
 
-            const medico = await this.medicoDAO.findByEmail(decoded.dni);
+            const medico = await this.medicoDAO.findByDNI(decoded.dni);
             return medico !== null;
         }catch(error){
             return false;

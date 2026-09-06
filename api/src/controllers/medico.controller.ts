@@ -10,8 +10,8 @@ const medicoService = new MedicoService(medicoDAO);
 router.route("/auth")
     .post(async (req,res)=>{
         try{
-            const {email, password} = req.body || {};
-            return await medicoService.login(email, password)
+            const {dni, password} = req.body || {};
+            return await medicoService.login(dni, password)
         }catch(error){
             return res.status(400).json(error)
         }
