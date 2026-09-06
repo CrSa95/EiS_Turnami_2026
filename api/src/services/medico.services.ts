@@ -9,6 +9,11 @@ export interface TokenResponseMedico {
     user: IMedico
 }
 
+interface MedicoTokenPayload extends JwtPayload {
+    id: string;
+    dni: string;
+}
+
 export default class MedicoServices {
     private medicoDAO: MedicoDAO
     constructor(medicoDAO: MedicoDAO) {
@@ -43,5 +48,20 @@ export default class MedicoServices {
                 dni: medico.dni,
             }
         };
+    }
+
+    async validateToken(token: string): Promise<boolean> {
+        try {
+            const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";
+            const decoded = jwt.verify(token, secret) as MedicoTokenPayload;
+            if (!decoded?.dni) {
+                return false;
+            }
+
+            const medico = await this.medicoDAO.findByEmail(decoded.dni);
+            return medico !== null;
+        }catch(error){
+            return false;
+        }
     }
 }

@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 import { jest, describe, it, beforeEach } from "@jest/globals";
 
@@ -65,4 +66,62 @@ describe("MedicoService", () => {
             );
         });
     });
+
+    describe("#validateToken", ()=>{
+        const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";
+        const medicoMock: IMedico = {
+            _id: new Types.ObjectId(),
+            dni: "2222222",
+            password: "hashedPasswordMock",
+        } as IMedico;
+
+        it("devuelve true si el token es válido y el médico existe", async () => {
+            // Generamos un token válido con el mismo secret y payload que usa el servicio
+            const validToken = jwt.sign(
+                { id: medicoMock._id, dni: medicoMock.dni },
+                secret,
+                { expiresIn: "1h" }
+            );
+
+            mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock);
+
+            const isValid = await medicoServices.validateToken(validToken);
+
+            expect(isValid).toBe(true);
+            expect(mockMedicoDAO.findByEmail).toHaveBeenCalledWith(medicoMock.dni);
+        });
+
+        it("devuelve false si el token está corrupto o mal formado", async () => {
+            const isValid = await medicoServices.validateToken("token_invalido_zaraza");
+
+            expect(isValid).toBe(false);
+            expect(mockMedicoDAO.findByEmail).not.toHaveBeenCalled();
+        });
+
+        it("devuelve false si el token fue firmado con otro secret", async () => {
+            const foreignToken = jwt.sign(
+                { id: medicoMock._id, dni: medicoMock.dni },
+                "otro_secret_desconocido"
+            );
+
+            const isValid = await medicoServices.validateToken(foreignToken);
+
+            expect(isValid).toBe(false);
+            expect(mockMedicoDAO.findByEmail).not.toHaveBeenCalled();
+        });
+
+        it("devuelve false si el token es válido pero el médico ya no existe en el DAO", async () => {
+            const validToken = jwt.sign(
+                { id: medicoMock._id, dni: medicoMock.dni },
+                secret
+            );
+
+            mockMedicoDAO.findByEmail.mockResolvedValue(null);
+
+            const isValid = await medicoServices.validateToken(validToken);
+
+            expect(isValid).toBe(false);
+            expect(mockMedicoDAO.findByEmail).toHaveBeenCalledWith(medicoMock.dni);
+        });
+    })
 });

@@ -17,5 +17,30 @@ router.route("/auth")
         }
 
     })
+.get(async (req, res) => {
+        try {
+            const authHeader = req.headers.authorization;
+            const oauthToken = authHeader?.startsWith("Bearer ")
+                ? authHeader.split(" ")[1]
+                : (req.query.token as string);
+
+            if (!oauthToken) {
+                return res.status(400).json({ 
+                    message: "Token OAuth no proporcionado en los encabezados o parámetros" 
+                });
+            }                        
+            const session = await medicoService.validateToken(oauthToken);
+
+            return res.status(200).json(session);
+        } catch (error) {
+            const errorMessage = error instanceof Error 
+                ? error.message 
+                : "Token OAuth inválido o expirado";
+
+            return res.status(401).json({ 
+                message: errorMessage 
+            });
+        }
+    })
 
 export default router;
