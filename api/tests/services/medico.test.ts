@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
-import { jest, describe, it, beforeEach } from "@jest/globals";
+import { jest, describe, it, beforeEach, beforeAll, expect} from "@jest/globals";
 
-import PasswordService from "../../src/services/password.services";
-import MedicoServices from "../../src/services/medico.services";
-import MedicoDAO from "../../src/dao/medico.dao";
+import PasswordService from "../../src/services/password.services.js";
+import MedicoServices from "../../src/services/medico.services.js";
+import MedicoDAO from "../../src/dao/medico.dao.js";
 
 import { IMedico } from "../../src/model/medico.model.js";
 
@@ -60,7 +60,7 @@ describe("MedicoService", () => {
 
             expect(access_token).toBeDefined();
             expect(user.dni).toBe(medicoLogin.dni);
-            expect(user.id).toEqual(medicoMock._id);
+            expect(user.id.toString()).toBe(medicoMock._id?.toString());
             expect(mockMedicoDAO.findByDNI).toHaveBeenCalledWith(
                 medicoLogin.dni,
             );

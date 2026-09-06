@@ -1,6 +1,6 @@
 import { Router  } from 'express';
-import MedicoService from '../services/medico.services';
-import MedicoDAO from '../dao/medico.dao';
+import MedicoService from '../services/medico.services.js';
+import MedicoDAO from '../dao/medico.dao.js';
 
 const router = Router();
 const medicoDAO = new MedicoDAO();

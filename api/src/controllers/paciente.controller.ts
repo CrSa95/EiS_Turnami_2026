@@ -1,8 +1,10 @@
 import { Router  } from 'express';
-import PacienteServices from '../services/paciente.services';
+import PacienteServices from '../services/paciente.services.js';
+import PacienteDAO from '../dao/paciente.dao.js';
 const router = Router();
 
-const pacienteServices = new PacienteServices()
+const pacienteDAO = new PacienteDAO();
+const pacienteServices = new PacienteServices(pacienteDAO)
 
 router.route("/auth")
     .post(async(req, res)=>{

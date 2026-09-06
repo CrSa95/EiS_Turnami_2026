@@ -1,13 +1,10 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
-import { jest, describe, it, beforeEach } from "@jest/globals";
-import jwt from "jsonwebtoken";
-import { Types } from "mongoose";
 import { jest, describe, it, beforeEach, beforeAll, expect } from "@jest/globals";
 
-import PasswordService from "../../src/services/password.services";
-import PacienteServices from "../../src/services/paciente.services";
-import PacienteDAO from "../../src/dao/paciente.dao";
+import PasswordService from "../../src/services/password.services.js";
+import PacienteServices from "../../src/services/paciente.services.js";
+import PacienteDAO from "../../src/dao/paciente.dao.js";
 
 import { IPaciente } from "../../src/model/paciente.model.js";
 
@@ -63,7 +60,7 @@ describe("PacienteService", () => {
 
             expect(access_token).toBeDefined();
             expect(user.dni).toBe(pacienteLogin.dni);
-            expect(user.id).toEqual(pacienteMock._id);
+            expect(user.id).toBe(pacienteMock._id?.toString());
             expect(mockPacienteDAO.findByDNI).toHaveBeenCalledWith(
                 pacienteLogin.dni,
             );

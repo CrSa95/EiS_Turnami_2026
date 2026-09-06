@@ -1,12 +1,12 @@
 import jwt,{JwtPayload} from "jsonwebtoken";
-import MedicoDAO from "../dao/medico"
-import {IMedico} from "../model/medico"
-import PasswordService from "./password.services"
+import MedicoDAO from "../dao/medico.dao.js"
+import {IMedico} from "../model/medico.model.js"
+import PasswordService from "./password.services.js"
 
 export interface TokenResponseMedico {
     access_token: string;
     token_type: "Bearer";
-    user: IMedico
+    user: MedicoTokenPayload
 }
 
 interface MedicoTokenPayload extends JwtPayload {
@@ -44,7 +44,7 @@ export default class MedicoServices {
             access_token: token,
             token_type: "Bearer",
             user: {
-                id: medico._id,
+                id: medico._id?.toString() || "",
                 dni: medico.dni,
             }
         };
