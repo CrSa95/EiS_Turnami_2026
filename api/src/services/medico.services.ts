@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt,{JwtPayload} from "jsonwebtoken";
 import MedicoDAO from "../dao/medico"
 import {IMedico} from "../model/medico"
 import PasswordService from "./password.services"

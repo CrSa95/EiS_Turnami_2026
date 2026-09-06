@@ -1,4 +1,5 @@
 import medicoRouter from "./controllers/medico.controller"
+import pacienteRouter from "./controllers/paciente.controller"
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from "morgan"
@@ -9,5 +10,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 
 app.use("/api/v1/medico", medicoRouter)
-
+app.use("/api/v1/paciente", pacienteRouter)
 export default app;
