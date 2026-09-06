@@ -17,7 +17,7 @@ router.route("/auth")
         }
 
     })
-.get(async (req, res) => {
+    .get(async (req, res) => {
         try {
             const authHeader = req.headers.authorization;
             const oauthToken = authHeader?.startsWith("Bearer ")
