@@ -25,7 +25,7 @@ describe("MedicoService", () => {
 
     describe("#login", () => {
         const medicoLogin = {
-            email: "test@medico.com",
+            dni: "2222222",
             password: "contraseñaEjemplo",
         };
         let medicoMock: IMedico
@@ -33,7 +33,7 @@ describe("MedicoService", () => {
         beforeAll(async () => {
             medicoMock = {
                 _id: new Types.ObjectId(),
-                email: medicoLogin.email,
+                dni: medicoLogin.dni,
                 password: await PasswordService.hash(medicoLogin.password)
             };
         })
@@ -44,7 +44,7 @@ describe("MedicoService", () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock);
             await assert.rejects(
                 async () => {
-                    await medicoServices.login(medicoLogin.email, "zaraza");
+                    await medicoServices.login(medicoLogin.dni, "zaraza");
                 },
                 {
                     message: "Error al iniciar sesión, intente nuevamente",
@@ -52,17 +52,17 @@ describe("MedicoService", () => {
             );
         });
 
-        it('correo inexistente lanza error con el mensaje "Error al iniciar sesion, intente nuevamente"', async () => {
+        it('DNI inexistente lanza error con el mensaje "Usted no se encuentra registrado"', async () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(null);
             await assert.rejects(
                 async () => {
                     await medicoServices.login(
-                        "fake@correo.com",
+                        "0000000",
                         medicoLogin.password,
                     );
                 },
                 {
-                    message: "Error al iniciar sesión, intente nuevamente",
+                    message: "Usted no se encuentra registrado",
                 },
             );
         });
@@ -70,10 +70,10 @@ describe("MedicoService", () => {
 
         it("correo y contraseña correcto devuelve un token", async () => {
             mockMedicoDAO.findByEmail.mockResolvedValue(medicoMock)
-            let { access_token, user } = await medicoServices.login(medicoLogin.email, medicoLogin.password)
+            let { access_token, user } = await medicoServices.login(medicoLogin.dni, medicoLogin.password)
 
             expect(access_token).toBeDefined();
-            expect(user.email).toBe(medicoLogin.email);
+            expect(user.dni).toBe(medicoLogin.dni);
             expect(user.id).toEqual(medicoMock._id);
         })
     });

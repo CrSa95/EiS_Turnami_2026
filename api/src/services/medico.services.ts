@@ -14,11 +14,11 @@ export default class MedicoServices {
     constructor(medicoDAO: MedicoDAO) {
         this.medicoDAO = medicoDAO
     }
-    async login(email: string, password: string): Promise<TokenResponseMedico>{
+    async login(dni: string, password: string): Promise<TokenResponseMedico>{
 
-        let medico: IMedico | null = await this.medicoDAO.findByEmail(email)
+        let medico: IMedico | null = await this.medicoDAO.findByEmail(dni)
         if(!medico){
-            throw new Error("Error al iniciar sesión, intente nuevamente")
+            throw new Error("Usted no se encuentra registrado")
         }
 
 
@@ -31,7 +31,7 @@ export default class MedicoServices {
 
         const token = jwt.sign({
             id: medico._id,
-            email: medico.email
+            dni: medico.dni
         }, secret)
 
 
@@ -40,7 +40,7 @@ export default class MedicoServices {
             token_type: "Bearer",
             user: {
                 id: medico._id,
-                email: medico.email,
+                dni: medico.dni,
             }
         };
     }

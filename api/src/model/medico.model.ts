@@ -2,11 +2,11 @@ import { Schema, model, Types} from 'mongoose';
 
 export interface IMedico {
     _id?: Types.ObjectId | string;
-    email: string;
+    dni: string;
     password: string;
 }
 const medicoSchema = new Schema({
-    email: {type: String, required: true},
+    dni: {type: String, required: true},
     password: { type: String, required: true }    
 });
 
