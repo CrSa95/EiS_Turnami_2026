@@ -1,23 +1,16 @@
 # EiS_PaMi_2026
 
-## Dev build
 
-1. Ir al directorio del repositorio 
-```
-cd EiS_Turnami_2026 
-```
+## Instalacion de deps 
 
-2. Instalar las dependecias 
+1. Instalar dependencias de la app
 ```
-npm i 
-```
+npm install && cd api/ && npm install && cd ..
+``` 
 
-3. levantar app web 
+2. iniciar app 
 ```
-npm run dev 
+npm run start
 ```
 
-4. En otra consola, levantar api 
-```
-cd api/ && npm run dev
-```
+3. abrir la app yendo a la pagina http://localhost:5173/
