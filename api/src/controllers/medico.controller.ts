@@ -11,6 +11,7 @@ router.route("/auth")
     .post(async (req,res)=>{
         try{
             const {dni, password} = req.body || {};
+            console.log(req.body)
             return await medicoService.login(dni, password)
         }catch(error){
             return res.status(400).json(error)
