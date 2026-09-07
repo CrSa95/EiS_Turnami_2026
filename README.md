@@ -1,15 +1,16 @@
 # EiS_PaMi_2026
 
-## Setup
 
-1. crear un archivo .env en la raiz de la carpeta con las siguiente info 
+## Instalacion de deps 
+
+1. Instalar dependencias de la app
 ```
-MONGO_URI=URI-A-MongoDB
+npm install && cd api/ && npm install && cd ..
+``` 
+
+2. iniciar app 
+```
+npm run start
 ```
 
-2. Buildear y levantar proyecto
-```
-npm install 
-npm run dev
-```
-
+3. abrir la app yendo a la pagina http://localhost:5173/
