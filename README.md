@@ -1,15 +1,23 @@
 # EiS_PaMi_2026
 
-## Setup
+## Dev build
 
-1. crear un archivo .env en la raiz de la carpeta con las siguiente info 
+1. Ir al directorio del repositorio 
 ```
-MONGO_URI=URI-A-MongoDB
-```
-
-2. Buildear y levantar proyecto
-```
-npm install 
-npm run dev
+cd EiS_Turnami_2026 
 ```
 
+2. Instalar las dependecias 
+```
+npm i 
+```
+
+3. levantar app web 
+```
+npm run dev 
+```
+
+4. En otra consola, levantar api 
+```
+cd api/ && npm run dev
+```
