@@ -1,5 +1,5 @@
-import medicoRouter from "./controllers/medico.controller"
-import pacienteRouter from "./controllers/paciente.controller"
+import medicoRouter from "./controllers/medico.controller.js"
+import pacienteRouter from "./controllers/paciente.controller.js"
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from "morgan"

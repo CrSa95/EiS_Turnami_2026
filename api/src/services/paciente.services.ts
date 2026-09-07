@@ -1,12 +1,12 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import PacienteDAO from "../dao/paciente.dao";
-import { IPaciente } from "../model/paciente.model";
-import PasswordService from "./password.services";
+import PacienteDAO from "../dao/paciente.dao.js";
+import { IPaciente } from "../model/paciente.model.js";
+import PasswordService from "./password.services.js";
 
 export interface TokenResponsePaciente {
     access_token: string;
     token_type: "Bearer";
-    user: IPaciente;
+    user: PacienteTokenPayload;
 }
 
 interface PacienteTokenPayload extends JwtPayload {
@@ -47,7 +47,7 @@ export default class PacienteServices {
             access_token: token,
             token_type: "Bearer",
             user: {
-                id: paciente._id,
+                id: paciente._id?.toString() || "",
                 dni: paciente.dni,
             },
         };
