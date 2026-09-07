@@ -12,6 +12,8 @@ export interface TokenResponseMedico {
 interface MedicoTokenPayload extends JwtPayload {
     id: string;
     dni: string;
+    nombre?: string;
+    apellido?: string;
 }
 
 export default class MedicoServices {
@@ -46,6 +48,8 @@ export default class MedicoServices {
             user: {
                 id: medico._id?.toString() || "",
                 dni: medico.dni,
+                nombre: medico.nombre,
+                apellido: medico.apellido,
             }
         };
     }
