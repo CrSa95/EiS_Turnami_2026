@@ -29,7 +29,7 @@ export default class MedicoServices {
 
         const isSamePassword = await PasswordService.compare(password,medico.password)
         if(!isSamePassword){
-            throw new Error("Error al iniciar sesión, intente nuevamente")
+            throw new Error("Su DNI o contraseña son incorrectos.")
         }
 
         const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";

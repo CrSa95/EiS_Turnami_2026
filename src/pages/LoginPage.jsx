@@ -31,6 +31,11 @@ function LoginPage() {
       return
     }
 
+    if (dni.length < 8) {
+      setModal({ type: 'error', message: 'Su DNI es incorrecto, faltan números.' })
+      return
+    }
+
     setIsSubmitting(true)
     try {
       const session = await authenticate(role, { dni, password })

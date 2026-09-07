@@ -12,6 +12,8 @@ export interface TokenResponsePaciente {
 interface PacienteTokenPayload extends JwtPayload {
     id: string;
     dni: string;
+    nombre?: string;
+    apellido?: string;
 }
 export default class PacienteServices {
     private pacienteDAO: PacienteDAO;
@@ -30,7 +32,7 @@ export default class PacienteServices {
             paciente.password,
         );
         if (!isSamePassword) {
-            throw new Error("Error al iniciar sesión, intente nuevamente");
+            throw new Error( "Su DNI o contraseña son incorrectos.");
         }
 
         const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";
@@ -49,6 +51,8 @@ export default class PacienteServices {
             user: {
                 id: paciente._id?.toString() || "",
                 dni: paciente.dni,
+                nombre: paciente.nombre,
+                apellido: paciente.apellido,
             },
         };
     }

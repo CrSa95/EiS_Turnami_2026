@@ -11,10 +11,16 @@ router.route("/auth")
     .post(async (req,res)=>{
         try{
             const {dni, password} = req.body || {};
-            console.log(req.body)
-            return await medicoService.login(dni, password)
+            const session = await medicoService.login(dni, password);
+            return res.status(201).json(session);
         }catch(error){
-            return res.status(400).json(error)
+            const mensaje = error instanceof Error
+                ? error.message
+                : "Error al iniciar sesión";
+            return res.status(400).json({
+                error: "fallo de inicio de sesion",
+                mensaje,
+            });
         }
 
     })

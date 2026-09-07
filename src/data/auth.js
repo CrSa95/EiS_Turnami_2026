@@ -20,7 +20,9 @@ async function request(role, options = {}) {
   const payload = await response.json().catch(() => ({}))
 
   if (!response.ok) {
-    throw new Error(payload.mensaje || 'No fue posible iniciar sesión. Intentá nuevamente.')
+    throw new Error(
+      payload.mensaje || payload.message || payload.error || 'No fue posible iniciar sesión. Intentá nuevamente.',
+    )
   }
 
   return payload
