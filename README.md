@@ -2,14 +2,24 @@
 
 ## Setup
 
-1. crear un archivo .env en la raiz de la carpeta con las siguiente info 
+1. crear un archivo .env en la carpeta /api con las siguiente info 
 ```
-MONGO_URI=URI-A-MongoDB
+MONGO_URI=mongodb://127.0.0.1:27017/turnami_db
 ```
 
-2. Buildear y levantar proyecto
+2. Buildear la primera vez y levantar proyecto, primero el backend y luego el frontend, en diferentes terminales
 ```
-npm install 
+BD:
+net start MongoDB
+
+BACKEND:
+cd api
+npm install
 npm run dev
+
+FRONTEND:
+npm install
+npm run dev
+
 ```
 

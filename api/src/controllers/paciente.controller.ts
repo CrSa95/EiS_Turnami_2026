@@ -9,10 +9,17 @@ const pacienteServices = new PacienteServices(pacienteDAO)
 router.route("/auth")
     .post(async(req, res)=>{
         try{
-            const {dni, password} = req.body;
-            return pacienteServices.login(dni, password)
+            const { dni, password } = req.body || {};
+            const session = await pacienteServices.login(dni, password);
+            return res.status(201).json(session);
         }catch(error){
-            return res.status(400).json(error)
+            const mensaje = error instanceof Error
+                ? error.message
+                : "Error al iniciar sesión";
+            return res.status(400).json({
+                error: "fallo de inicio de sesion",
+                mensaje,
+            });
         }
     })
     .get(async (req, res) => {
