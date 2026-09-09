@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import ImageDAO from '../dao/image.dao.js';
-
+import { Types } from 'mongoose';
 
 export default class ImageController {
     private imageDAO: ImageDAO;
@@ -39,6 +39,12 @@ export default class ImageController {
     public getImagesByPaciente = async (req: Request, res: Response): Promise<void> => {
         try {
             const pacienteId = req.params.pacienteId as string;
+            if (!pacienteId || !Types.ObjectId.isValid(pacienteId)) {
+                res.status(400).json({ message: 'El ID de paciente no es válido' });
+                return; // <--- El return corta la ejecución para que NO llame al DAO
+            }
+
+            //Solo se ejecuta si el ID es válido
             const images = await this.imageDAO.findByPacienteId(pacienteId);
 
             res.status(200).json(images);

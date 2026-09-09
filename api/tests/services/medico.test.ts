@@ -41,7 +41,7 @@ describe("MedicoService", () => {
             mockMedicoDAO.findByDNI.mockResolvedValue(medicoMock);
             await expect(
                 medicoServices.login(medicoLogin.dni, "passwordInvalido"),
-            ).rejects.toThrow("Error al iniciar sesión, intente nuevamente");
+            ).rejects.toThrow("Su DNI o contraseña son incorrectos.");
         });
 
         it('DNI inexistente lanza error con el mensaje "Usted no se encuentra registrado"', async () => {
