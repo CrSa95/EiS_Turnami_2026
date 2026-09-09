@@ -8,7 +8,7 @@ dotenv.config();
 import app from './app.js';
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || "http://localhost"
+const HOST = process.env.HOST || "http://localhost";
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://root:secretpassword@127.0.0.1:27017/turnami_db?authSource=admin';
 
 async function seedMedicoDePrueba() {
