@@ -54,7 +54,6 @@ function HomePage() {
       <section className="home-welcome" aria-labelledby="welcome-title">
         <p className="eyebrow">HOLA, {roleLabel.toUpperCase()}</p>
         <h1 id="welcome-title">Bienvenido/a, {fullName}</h1>
-        {role == "paciente" &&  <CargarReceta />}
         <Recetas recetas={recetas} rol={role} />
       </section>
     </main>
