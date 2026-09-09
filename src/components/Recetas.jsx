@@ -20,7 +20,9 @@ function Recetas({ rol, recetas }) {
     }
 
     return <div>
+        {rol == "paciente" &&  <CargarReceta />}
         <h1>Recetas</h1>
+
         {
             headersRecetas()
         }
