@@ -9,7 +9,7 @@ function ModalState({ state, setState }) {
     useEffect(() => {
         if (state !== States.Ok && state !== States.Error) return
 
-        const timeoutId = setTimeout(() => setState('NONE'), 5000)
+        const timeoutId = setTimeout(() => setState('NONE'), 3000)
         return () => clearTimeout(timeoutId)
     }, [state, setState])
 
