@@ -28,7 +28,7 @@ function CargarReceta() {
 
     return (
         <section className="cargar-receta">
-             <h2 className="recetas-title">Cargar receta</h2>
+             <h2 className="recetas-title">Cargá tu receta</h2>
 
             <label className="upload-label" htmlFor="receta-file">Sube únicamente una foto de tu documento (formato JPG o PNG). No se aceptan archivos PDF ni documentos de texto.</label>
             <input

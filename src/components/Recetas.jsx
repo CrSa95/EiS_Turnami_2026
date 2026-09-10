@@ -1,8 +1,9 @@
 import '../styles/recetas.css'
+import Badge from './Badge';
 import CargarReceta from './CargarReceta'
 
 function Recetas({ rol, recetas }) {
-    const title = rol == 'paciente' ? 'Mis Recetas' : 'Recetas pendientes'
+    const title = rol == 'paciente' ? 'Recetas solicitadas' : 'Recetas pendientes'
 
     return (
         <div className="recetas-layout">
@@ -17,12 +18,18 @@ function Recetas({ rol, recetas }) {
                             <span className="receta-icon" aria-hidden="true">💊</span>
                             <div className="receta-content">
                                 <div className="receta-heading">
-                                    <span className="receta-type">Receta</span>
+                                     
                                     <p className="receta-name">{e.receta.nombre}</p>
                                 </div>
-                                <p className="receta-details">
-                                    {e.paciente.nombre} {e.paciente.apellido} · {e.receta.descripcion}
+                               {
+                                rol !== 'paciente' ?  <p className="receta-details">
+                                    {e.paciente.nombre} {e.paciente.apellido} · {e.receta.fecha}
+                                </p> : 
+                                 <p className="receta-details">
+                                   {e.receta.fecha}
                                 </p>
+                               }
+                               <Badge/>
                             </div>
                         </article>
                     ))}

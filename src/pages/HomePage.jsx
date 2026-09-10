@@ -38,14 +38,14 @@ function HomePage() {
       paciente: { nombre: "Narela", apellido:  "Camara"},
       receta: {
          nombre: "Esitalopran", 
-         descripcion: "le agarro el bajon ahhre"
+         fecha: '2026-09-01'
       }
     },
     {
       paciente: { nombre: "Rocio", apellido:  "Camara"},
       receta: {
          nombre: "Esitalopran", 
-         descripcion: "le agarro el bajon ahhre"
+         fecha: '2026-09-01'
       }
     }
   ]
