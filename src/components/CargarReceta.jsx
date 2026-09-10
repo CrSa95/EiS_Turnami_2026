@@ -30,7 +30,7 @@ function CargarReceta() {
         <section className="cargar-receta">
              <h2 className="recetas-title">Cargar receta</h2>
 
-            <label className="upload-label" htmlFor="receta-file">Solo acepta formatos tipo imagen, No PDF</label>
+            <label className="upload-label" htmlFor="receta-file">Sube únicamente una foto de tu documento (formato JPG o PNG). No se aceptan archivos PDF ni documentos de texto.</label>
             <input
                 ref={fileInputRef}
                 id="receta-file"
