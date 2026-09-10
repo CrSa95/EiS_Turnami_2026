@@ -29,7 +29,19 @@ function Recetas({ rol, recetas }) {
                                    {e.receta.fecha}
                                 </p>
                                }
-                               <Badge/>
+                               
+                               <div className="receta-actions">
+                                <Badge />
+                                   <button className="receta-action receta-action-secondary" type="button">
+                                       Ver
+                                   </button>
+                                   <button className="receta-action receta-action-secondary" type="button">
+                                       Descargar
+                                   </button>
+                                   { rol !== 'paciente' && <button className="receta-action receta-action-primary" type="button">
+                                       Aprobar transcriptcion
+                                   </button>}
+                               </div>
                             </div>
                         </article>
                     ))}

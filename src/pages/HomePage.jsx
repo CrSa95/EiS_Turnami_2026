@@ -53,7 +53,7 @@ function HomePage() {
   const subtitle = role == 'paciente' ? `Visualiza y envia tus recetas` : `Gestiona y transcrive las recetas`
   return (
     <main className="home-page">
-      <Navigation title={`Bienvenido/a/e,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
+      <Navigation title={`Bienvenido/a,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
         <Recetas recetas={recetas} rol={role} />
     </main>
   )

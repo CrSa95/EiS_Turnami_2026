@@ -86,6 +86,42 @@
 	white-space: nowrap;
 }
 
+.receta-actions {
+	display: flex;
+	flex: 1;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.receta-action {
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.receta-action-secondary {
+	border: 1px solid #e2e8f0;
+	color: #334155;
+	background: #fff;
+}
+
+.receta-action-secondary:hover {
+	background: #f8fafc;
+}
+
+.receta-action-primary {
+	border: 1px solid #2563eb;
+	color: #fff;
+	background: #2563eb;
+}
+
+.receta-action-primary:hover {
+	background: #1d4ed8;
+}
+
 /* Tablet */
 @media (min-width: 561px) and (max-width: 1024px) {
 	.recetas {
