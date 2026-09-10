@@ -6,8 +6,16 @@ export default class ImageDAO {
         return await newImage.save();
     }
 
-    // Buscar todas las imágenes que pertenecen a un paciente en particular
-    async findByPacienteId(pacienteId: string): Promise<IImage[]> {
-        return await ImageModel.find({ pacienteId }).sort({ _id: -1 });
+    // Buscar imágenes de un paciente por su DNI
+    async findByPacienteDni(pacienteDni: string): Promise<IImage[]> {
+        return await ImageModel.find({ pacienteDni }).sort({ createdAt: -1 });
+    }
+
+    // Buscar imágenes pendientes para una lista de DNIs de pacientes
+    async findPendingByPacientesDni(pacienteDnis: string[]): Promise<IImage[]> {
+        return await ImageModel.find({
+            pacienteDni: { $in: pacienteDnis },
+            estado: 'Pendiente'
+        }).sort({ createdAt: -1 });
     }
 }

@@ -8,12 +8,19 @@ export interface IMulterFile {
 }
 
 export default class UploadServices {
-    async guardarMetadatosImagen(file: IMulterFile): Promise<IImage> {
+    async guardarMetadatosImagen(
+        file: IMulterFile,
+        pacienteDni?: string,
+        idReceta?: string
+    ): Promise<IImage> {
         const newImage = new ImageModel({
+            idReceta: idReceta || `R${Math.floor(1000 + Math.random() * 9000)}`,
             filename: file.filename,
             filepath: `/uploads/${file.filename}`,
             mimetype: file.mimetype,
-            size: file.size
+            size: file.size,
+            pacienteDni: pacienteDni || '',
+            estado: 'Pendiente'
         });
 
         return await newImage.save();
