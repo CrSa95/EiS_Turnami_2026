@@ -56,7 +56,7 @@ function HomePage() {
     console.log('request', request)
    }
 
-  useEffect( () => { doctorPatientsImages(session.access_token)}, [])
+//  useEffect( () => { doctorPatientsImages(session.access_token)}, [])
 
   
 

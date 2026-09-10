@@ -7,15 +7,11 @@ function CargarReceta({handleImage}) {
     const [file, setFile] = useState(null)
     const fileInputRef = useRef(null)
 
-   
-
     const handleUpload = () => fileInputRef.current?.click()
 
     const handleFileChange = (event) => {
         const file = event.target.files?.[0]
         if (!file) return
-        
-        
         setUploading(true)
         setFile(file)
         window.setTimeout(() => {
@@ -28,14 +24,14 @@ function CargarReceta({handleImage}) {
         <section className="cargar-receta">
              <h2 className="recetas-title">Cargá tu receta</h2>
 
-            <label className="upload-label" htmlFor="receta-file">Sube únicamente una foto de tu documento (formato JPG o PNG). No se aceptan archivos PDF ni documentos de texto.</label>
+            <label className="upload-label" htmlFor="receta-file">Sube únicamente una foto de tu documento (formato JPG, JPEG o PNG). No se aceptan archivos PDF ni documentos de texto.</label>
             <input
                 ref={fileInputRef}
                 id="receta-file"
                 className="upload-input"
                 type="file"
-                accept="image/jpeg,image/png,application/pdf"
                 onChange={handleFileChange}
+                accept=".jpg, .jpeg, .png"
             />
             <div
                 className={`upload-zone ${uploaded ? 'is-uploaded' : ''}`}
@@ -69,7 +65,7 @@ function CargarReceta({handleImage}) {
 
             <button
                 className="issue-button"
-                style={{ backgroundColor: cfg.accent }}
+                style={{ backgroundColor: '#2563EB' }}
                 type="button"
                 onClick={() => {handleImage(file)}}
             >
