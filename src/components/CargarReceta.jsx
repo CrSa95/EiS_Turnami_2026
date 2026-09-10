@@ -67,7 +67,7 @@ function CargarReceta({handleImage}) {
                 className="issue-button"
                 style={{ backgroundColor: '#2563EB' }}
                 type="button"
-                onClick={() => {handleImage(file)}}
+                onClick={() => handleImage(file)}
             >
                 Enviar Receta
             </button>

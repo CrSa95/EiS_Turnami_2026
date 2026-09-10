@@ -6,6 +6,13 @@ import '../styles/home.css'
 import Recetas from '../components/Recetas'
 import Navigation from '../components/Navigation'
 import Modal from '../components/modal'
+import ModalState from '../components/ModalStates'
+
+export const States = {
+  Error: 'Error',
+  Ok: 'Ok',
+  Loading: 'Loading',
+}
 
 function HomePage() {
   const [session, setSession] = useState(() => {
@@ -13,6 +20,8 @@ function HomePage() {
     return storedSession ? JSON.parse(storedSession) : null
   })
   const navigate = useNavigate()
+
+  const [state, setState] = useState('NONE')
 
   useEffect(() => {
     if (!session) return
@@ -26,7 +35,6 @@ function HomePage() {
   if (!session) return <Navigate to="/" replace />
 
   const fullName = [session.user.nombre, session.user.apellido].filter(Boolean).join(' ')
-  const roleLabel = session.role === 'patient' ? 'paciente' : 'profesional'
   const role = session.role === 'patient' ? 'paciente' : 'medico'
 
   const handleLogout = () => {
@@ -51,25 +59,27 @@ function HomePage() {
     }
   ]
 
+  console.log('nare', state)
 
-  const handleImage = () => {
-    const request = patientUploadImage(session.access_token)
-    console.log('request', request)
+  const handleImage = (file) => {
+    setState(States.Loading)
+    try {
+//      const request = patientUploadImage(session.access_token, file)
+  //    console.log('request', request)
+      setState(States.Ok)
+    } catch (error) {
+      setState(States.Error)
+    }
   }
 
   //  useEffect( () => { doctorPatientsImages(session.access_token)}, [])
-
-
-  /* <Modal status="Ok" message="Guardado correctamente" />
-   * <Modal status="Fallo" message="No se pudo completar la operación" onClose={() => {}} />        
-   * <Modal status="Cargando" />
-  */
 
   const subtitle = role == 'paciente' ? `Visualiza y envia tus recetas` : `Gestiona y transcrive las recetas`
   return (
     <main className="home-page">
       <Navigation title={`Bienvenido/a,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
       <Recetas recetas={recetas} rol={role} handleImage={handleImage} />
+      <ModalState state={state} setState={setState} />
     </main>
   )
 }
