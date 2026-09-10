@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "types": ["node", "jest", "Multer"],
+    "types": ["node", "jest", "multer"],
     "isolatedModules": true,
     "declaration": false,
     "removeComments": true,
