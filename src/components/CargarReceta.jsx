@@ -1,25 +1,23 @@
 import { useRef, useState } from 'react'
 import '../styles/cargarReceta.css'
 
-function CargarReceta() {
-    const [tab, setTab] = useState('receta')
+function CargarReceta({handleImage}) {
     const [uploaded, setUploaded] = useState(false)
     const [uploading, setUploading] = useState(false)
-    const [fileName, setFileName] = useState('')
+    const [file, setFile] = useState(null)
     const fileInputRef = useRef(null)
 
-    const cfg = tab === 'receta'
-        ? { accent: '#2563EB', bg: '#EFF6FF' }
-        : { accent: '#D97706', bg: '#FFFBEB' }
+   
 
     const handleUpload = () => fileInputRef.current?.click()
 
     const handleFileChange = (event) => {
         const file = event.target.files?.[0]
         if (!file) return
-
+        
+        
         setUploading(true)
-        setFileName(file.name)
+        setFile(file)
         window.setTimeout(() => {
             setUploading(false)
             setUploaded(true)
@@ -42,7 +40,7 @@ function CargarReceta() {
             <div
                 className={`upload-zone ${uploaded ? 'is-uploaded' : ''}`}
                 onClick={handleUpload}
-                style={{ '--upload-accent': cfg.accent, '--upload-bg': cfg.bg }}
+                style={{ '--upload-accent':  '#2563EB', '--upload-bg':  '#EFF6FF' }}
                 role="button"
                 tabIndex="0"
                 onKeyDown={(event) => {
@@ -58,7 +56,7 @@ function CargarReceta() {
                     <div className="upload-state">
                         <span className="upload-icon" aria-hidden="true">✅</span>
                         <p className="upload-message upload-message-accent">Archivo cargado</p>
-                        <p className="upload-file-name">{fileName}</p>
+                        <p className="upload-file-name">{file.name}</p>
                     </div>
                 ) : (
                     <div className="upload-state">
@@ -73,6 +71,7 @@ function CargarReceta() {
                 className="issue-button"
                 style={{ backgroundColor: cfg.accent }}
                 type="button"
+                onClick={() => {handleImage(file)}}
             >
                 Enviar Receta
             </button>

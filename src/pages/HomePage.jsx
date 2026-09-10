@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import BrandMark from '../components/BrandMark'
-import { validateSession } from '../data/auth'
+import { doctorPatientsImages, patientUploadImage, validateSession } from '../data/auth'
 import '../styles/home.css'
 import Recetas from '../components/Recetas'
 import Navigation from '../components/Navigation'
@@ -50,11 +50,21 @@ function HomePage() {
     }
   ]
 
+  
+  const handleImage = () => {
+    const request = patientUploadImage(session.access_token)
+    console.log('request', request)
+   }
+
+  useEffect( () => { doctorPatientsImages(session.access_token)}, [])
+
+  
+
   const subtitle = role == 'paciente' ? `Visualiza y envia tus recetas` : `Gestiona y transcrive las recetas`
   return (
     <main className="home-page">
       <Navigation title={`Bienvenido/a,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
-        <Recetas recetas={recetas} rol={role} />
+        <Recetas recetas={recetas} rol={role} handleImage={handleImage} />
     </main>
   )
 }

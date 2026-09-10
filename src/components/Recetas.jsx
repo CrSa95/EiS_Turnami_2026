@@ -2,13 +2,13 @@ import '../styles/recetas.css'
 import Badge from './Badge';
 import CargarReceta from './CargarReceta'
 
-function Recetas({ rol, recetas }) {
+function Recetas({ rol, recetas, handleImage }) {
     const title = rol == 'paciente' ? 'Recetas solicitadas' : 'Recetas pendientes'
 
     return (
         <div className="recetas-layout">
             {rol === 'paciente' && <div className="recetas">
-                <CargarReceta />
+                <CargarReceta handleImage={handleImage} />
             </div>}
             <div className="recetas">
                 <h2 className="recetas-title">{title}</h2>
