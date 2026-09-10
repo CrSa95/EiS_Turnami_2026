@@ -1,10 +1,12 @@
 .recetas {
-	margin-top: 36px;
+	margin: 16px;
     padding: 24px;
 	border: 1px solid #f1f5f9;
 	border-radius: 16px;
 	background: #fff;
 	box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+	display: flex;
+	flex-direction: column;
 }
 
 .recetas-title {
