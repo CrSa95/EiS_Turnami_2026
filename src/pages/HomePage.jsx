@@ -4,6 +4,7 @@ import BrandMark from '../components/BrandMark'
 import { validateSession } from '../data/auth'
 import '../styles/home.css'
 import Recetas from '../components/Recetas'
+import Navigation from '../components/Navigation'
 
 function HomePage() {
   const [session, setSession] = useState(() => {
@@ -48,14 +49,12 @@ function HomePage() {
       }
     }
   ]
+
+  const subtitle = role == 'paciente' ? `Visualiza y envia tus recetas` : `Gestiona y transcrive las recetas`
   return (
     <main className="home-page">
-      <header className="home-header"><div className="home-brand"><BrandMark /></div><button type="button" onClick={handleLogout}>Cerrar sesión</button></header>
-      <section className="home-welcome" aria-labelledby="welcome-title">
-        <p className="eyebrow">HOLA, {roleLabel.toUpperCase()}</p>
-        <h1 id="welcome-title">Bienvenido/a, {fullName}</h1>
+      <Navigation title={`Bienvenido/a/e,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
         <Recetas recetas={recetas} rol={role} />
-      </section>
     </main>
   )
 }

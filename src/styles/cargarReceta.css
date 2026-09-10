@@ -1,0 +1,129 @@
+.cargar-receta {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 28px;
+}
+
+.cargar-receta-tabs {
+	display: flex;
+	gap: 8px;
+}
+
+.cargar-receta-tab {
+	padding: 8px 14px;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	color: #64748b;
+	background: #fff;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.cargar-receta-tab.is-active {
+	border-color: #bfdbfe;
+	color: #2563eb;
+	background: #eff6ff;
+}
+
+.upload-label {
+	margin-bottom: -4px;
+	color: #475569;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.upload-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+
+.upload-zone {
+	display: flex;
+	min-height: 190px;
+	align-items: center;
+	justify-content: center;
+	padding: 32px;
+	border: 2px dashed #e2e8f0;
+	border-radius: 12px;
+	background: #f8fafc;
+	cursor: pointer;
+	transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.upload-zone.is-uploaded {
+	border-color: var(--upload-accent);
+	background: var(--upload-bg);
+}
+
+.upload-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	text-align: center;
+}
+
+.upload-icon {
+	font-size: 30px;
+	line-height: 1;
+}
+
+.upload-message,
+.upload-file-name {
+	margin: 0;
+	font-size: 14px;
+}
+
+.upload-message {
+	color: #64748b;
+}
+
+.upload-message-accent {
+	color: var(--upload-accent);
+	font-weight: 500;
+}
+
+.upload-message-dark {
+	color: #334155;
+	font-weight: 500;
+}
+
+.upload-file-name {
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+.upload-spinner {
+	width: 32px;
+	height: 32px;
+	border: 2px solid #3b82f6;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: upload-spin 0.8s linear infinite;
+}
+
+.issue-button {
+	width: 100%;
+	padding: 12px;
+	border: 0;
+	border-radius: 12px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	transition: opacity 0.2s ease;
+}
+
+.issue-button:hover {
+	opacity: 0.9;
+}
+
+@keyframes upload-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
