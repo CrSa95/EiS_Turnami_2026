@@ -94,8 +94,40 @@
   background: #fff;
 }
 
+/* Tablet */
+@media (min-width: 561px) and (max-width: 1024px) {
+	.navigation-header {
+		padding: 16px 28px;
+	}
+}
+
+/* Celular */
 @media (max-width: 560px) {
 	.navigation-header {
-		padding: 16px 24px;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 14px 20px;
+	}
+
+	.navigation-heading {
+		flex: 1;
+	}
+
+	.navigation-title {
+		font-size: 16px;
+	}
+
+	.navigation-subtitle {
+		font-size: 12px;
+	}
+
+	.navigation-actions {
+		gap: 8px;
+	}
+
+	.navigation-button {
+		padding: 8px 10px;
+		font-size: 12px;
+		white-space: nowrap;
 	}
 }
