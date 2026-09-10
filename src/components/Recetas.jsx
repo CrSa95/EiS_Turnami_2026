@@ -13,7 +13,17 @@ function Recetas({ rol, recetas, handleImage }) {
             <div className="recetas">
                 <h2 className="recetas-title">{title}</h2>
                 <div className="recetas-list">
-                    {recetas.map((e, index) => (
+                    {recetas.length === 0 ? (
+                        <div className="recetas-empty" role="status">
+                            <span className="recetas-empty-icon" aria-hidden="true">✦</span>
+                            <h3>{rol === 'paciente' ? 'Aún no tienes recetas' : 'Todo está al día'}</h3>
+                            <p>
+                                {rol === 'paciente'
+                                    ? 'Cuando tengas una receta disponible, aparecerá aquí.'
+                                    : 'No hay recetas pendientes para revisar en este momento.'}
+                            </p>
+                        </div>
+                    ) : recetas.map((e, index) => (
                         <article className="receta-card" key={`${e.paciente.nombre}-${index}`}>
                             <span className="receta-icon" aria-hidden="true">💊</span>
                             <div className="receta-content">

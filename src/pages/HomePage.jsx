@@ -56,7 +56,48 @@ function HomePage() {
         nombre: "Esitalopran",
         fecha: '2026-09-01'
       }
-    }
+    },
+     {
+      paciente: { nombre: "Narela", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    },
+    {
+      paciente: { nombre: "Rocio", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    }, {
+      paciente: { nombre: "Narela", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    },
+    {
+      paciente: { nombre: "Rocio", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    },
+     {
+      paciente: { nombre: "Narela", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    },
+    {
+      paciente: { nombre: "Rocio", apellido: "Camara" },
+      receta: {
+        nombre: "Esitalopran",
+        fecha: '2026-09-01'
+      }
+    },
   ]
 
   console.log('nare', state)
@@ -78,7 +119,7 @@ function HomePage() {
   return (
     <main className="home-page">
       <Navigation title={`Bienvenido/a,  ${fullName}`} subtitle={subtitle} handleLogout={handleLogout} />
-      <Recetas recetas={recetas} rol={role} handleImage={handleImage} />
+      <Recetas recetas={[]} rol={role} handleImage={handleImage} />
       <ModalState state={state} setState={setState} />
     </main>
   )
