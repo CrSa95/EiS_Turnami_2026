@@ -5,10 +5,10 @@ function Recetas({ rol, recetas }) {
     const title = rol == 'paciente' ? 'Mis Recetas' : 'Recetas pendientes'
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-            <div className="recetas">
-                {rol === 'paciente' && <CargarReceta />}
-            </div>
+        <div className="recetas-layout">
+            {rol === 'paciente' && <div className="recetas">
+                <CargarReceta />
+            </div>}
             <div className="recetas">
                 <h2 className="recetas-title">{title}</h2>
                 <div className="recetas-list">

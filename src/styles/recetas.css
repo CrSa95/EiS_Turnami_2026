@@ -1,3 +1,9 @@
+.recetas-layout {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
 .recetas {
 	margin: 16px;
     padding: 24px;
