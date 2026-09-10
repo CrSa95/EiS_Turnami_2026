@@ -16,20 +16,27 @@ describe("UploadServices", () => {
             mimetype: "image/jpeg",
             size: 1024,
         };
+        const pacienteDni = "33445566";
+        const idReceta = "R1001";
 
         const mockSavedImage = {
             _id: "mock_mongo_id",
+            idReceta,
             ...mockFile,
             filepath: "/uploads/test-123456.jpg",
+            pacienteDni,
+            estado: "Pendiente"
         };
 
         jest.spyOn(ImageModel.prototype, "save").mockResolvedValue(mockSavedImage as any);
 
-        const result = await uploadServices.guardarMetadatosImagen(mockFile);
+        const result = await uploadServices.guardarMetadatosImagen(mockFile, pacienteDni, idReceta);
 
         expect(result).toBeDefined();
         expect(result.filename).toBe(mockFile.filename);
         expect(result.filepath).toBe(`/uploads/${mockFile.filename}`);
+        expect(result.pacienteDni).toBe(pacienteDni);
+        expect(result.idReceta).toBe(idReceta);
         expect(ImageModel.prototype.save).toHaveBeenCalledTimes(1);
     });
 });

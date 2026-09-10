@@ -1,20 +1,23 @@
 import medicoRouter from "./controllers/medico.controller.js";
 import pacienteRouter from "./controllers/paciente.controller.js";
-import express, { Application, Request, Response } from 'express';
+import express, {Application, NextFunction, Request, Response} from 'express';
 import cors from 'cors';
 import morgan from "morgan";
 import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
-
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
 
 // Importamos el DAO y Controlador de imágenes para mantener la arquitectura de capas
 import ImageDAO from './dao/image.dao.js';
+import PacienteDAO from './dao/paciente.dao.js';
 import ImageController from './controllers/image.controller.js';
 
 const app: Application = express();
+// Instanciamos el DAO y el Controlador de imágenes
+const imageDAO = new ImageDAO();
+const pacienteDAO = new PacienteDAO(); // Inyectamos el DAO de Paciente
+const imageController = new ImageController(imageDAO, pacienteDAO);
 
 app.use(cors());
 app.use(express.json());
@@ -40,10 +43,6 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
-
-// Instanciamos el DAO y el Controlador de imágenes
-const imageDAO = new ImageDAO();
-const imageController = new ImageController(imageDAO);
 
 // --- RUTAS DE LA API ---
 app.use("/api/v1/medico", medicoRouter);
@@ -109,7 +108,7 @@ const verificarTokenMedico = (req: Request, res: Response, next: NextFunction): 
     }
 };
 
-//Se verifico que el medico que solicita la peticion este correctamente logeado, por lo que va a poder realizar la peticion
-app.get("/api/v1/medico/paciente/:pacienteId/images", verificarTokenMedico, imageController.getImagesByPaciente);
+// Ruta para obtener el listado de recetas pendientes del médico logueado
+app.get("/api/v1/medico/recetas-pendientes", verificarTokenMedico, imageController.getPendingImagesForMedico);
 
 export default app;
