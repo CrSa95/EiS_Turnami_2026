@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
 // --- CONFIGURACIÓN DE CARPETA Y MULTER PARA IMÁGENES ---
-const uploadDir = path.resolve('uploads');
+const uploadDir = path.resolve("uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
@@ -40,7 +40,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+  },
 });
 const upload = multer({ storage });
 
@@ -48,26 +48,31 @@ const upload = multer({ storage });
 app.use("/api/v1/medico", medicoRouter);
 app.use("/api/v1/paciente", pacienteRouter);
 
-const verificarTokenPaciente = (req: Request, res: Response, next: NextFunction): void => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extrae el token del "Bearer <token>"
+const verificarTokenPaciente = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Extrae el token del "Bearer <token>"
 
-    if (!token) {
-        res.status(401).json({ message: 'Token no proporcionado' });
-        return;
+  if (!token) {
+    res.status(401).json({ message: "Token no proporcionado" });
+    return;
+  }
+
+  try {
+    const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";
+
+    // inyectamos el ID del paciente directamente en el request
+    if (token === "turnami-frontend-test-token") {
+      (req as any).user = {
+        id: "00000000-0000-4000-8000-000000000001",
+        dni: "12345678",
+      };
+      next();
+      return;
     }
-
-    try {
-        const secret = process.env.JWT_SECRET || 'secreto_super_seguro';
-
-        // inyectamos el ID del paciente directamente en el request
-        if (token === 'turnami-frontend-test-token') {
-            (req as any).user = { 
-                id: '00000000-0000-4000-8000-000000000001' // El id que viene en el TEST_SESSION de auth.js[cite: 6]
-            };
-            next();
-            return;
-        }
 
         // Si es un token real generado por el backend, lo verifica normalmente
         const decoded = jwt.verify(token, secret);
@@ -79,36 +84,63 @@ const verificarTokenPaciente = (req: Request, res: Response, next: NextFunction)
 };
 
 // Ruta para que el paciente (logueado) suba su imagen
-app.post("/api/v1/paciente/upload", verificarTokenPaciente, upload.single('image'), imageController.uploadImage);
+app.post(
+  "/api/v1/paciente/upload",
+  verificarTokenPaciente,
+  upload.single("image"),
+  imageController.uploadImage,
+);
+app.get(
+  "/api/v1/paciente/images",
+  verificarTokenPaciente,
+  imageController.getImagesByPaciente,
+);
 
 //MIDDLEWARE DE AUTENTICACIÓN
-const verificarTokenMedico = (req: Request, res: Response, next: NextFunction): void => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extrae el token del "Bearer <token>"
+const verificarTokenMedico = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Extrae el token del "Bearer <token>"
 
     if (!token) {
         res.status(401).json({ message: 'Token no proporcionado' });
         return;
     }
 
-    try {
-        const secret = process.env.JWT_SECRET || 'secreto_super_seguro';
+  try {
+    const secret = process.env.JWT_SECRET || "turnami_dev_secret_key";
 
-        // Si coincide con el token de prueba del front, lo dejamos pasar directamente
-        if (token === 'turnami-frontend-test-token') {
-            next();
-            return;
-        }
-
-        // Si es un token real generado por el backend, lo verifica con jsonwebtoken
-        jwt.verify(token, secret);
-        next(); // El token es válido, pasa al controlador
-    } catch (error) {
-        res.status(403).json({ message: 'Token inválido o expirado' });
+    // Si coincide con el token de prueba del front, lo dejamos pasar directamente
+    if (token === "turnami-frontend-test-token") {
+      (req as any).user = {
+        id: "00000000-0000-4000-8000-000000000001",
+        dni: "11223344",
+      };
+      next();
+      return;
     }
+
+    // Si es un token real generado por el backend, lo verifica con jsonwebtoken
+    (req as any).user = jwt.verify(token, secret);
+    next(); // El token es válido, pasa al controlador
+  } catch (error) {
+    res.status(403).json({ message: "Token inválido o expirado" });
+  }
 };
 
 // Ruta para obtener el listado de recetas pendientes del médico logueado
-app.get("/api/v1/medico/recetas-pendientes", verificarTokenMedico, imageController.getPendingImagesForMedico);
+app.get(
+  "/api/v1/medico/recetas-pendientes",
+  verificarTokenMedico,
+  imageController.getPendingImagesForMedico,
+);
+app.get(
+  "/api/v1/medico/paciente/:pacienteDni/images",
+  verificarTokenMedico,
+  imageController.getImagesByPaciente,
+);
 
 export default app;
