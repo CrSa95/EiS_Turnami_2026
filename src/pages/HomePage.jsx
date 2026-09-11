@@ -100,41 +100,35 @@ function HomePage() {
     }
   };
 
+  const handleDownload = async (url, filename = "imagen-descargada.jpg") => {
+    try {
+      // 1. Obtener la información de la imagen
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Error al descargar la imagen");
 
- 
-    const handleDownload = async (url, filename = 'imagen-descargada.jpg') => {
-      setLoading(true);
-      try {
-        // 1. Obtener la información de la imagen
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error al descargar la imagen');
-      
-        // 2. Convertir la respuesta a un Blob (Binary Large Object)
-        const blob = await response.blob();
-      
-        // 3. Crear una URL local temporal para ese Blob
-        const blobUrl = URL.createObjectURL(blob);
-      
-        // 4. Crear un enlace 'a' oculto en el DOM
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename; // Define el nombre con el que se guardará
-      
-        // 5. Simular el clic en el enlace para iniciar la descarga
-        document.body.appendChild(link);
-        link.click();
-      
-        // 6. Limpiar el DOM y liberar la memoria ocupada por la URL temporal
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        console.error("No se pudo guardar la imagen:", error);
-        alert("Hubo un problema al guardar la imagen.");
-      } finally {
-        setLoading(false);
-      }
-    };
- 
+      // 2. Convertir la respuesta a un Blob (Binary Large Object)
+      const blob = await response.blob();
+
+      // 3. Crear una URL local temporal para ese Blob
+      const blobUrl = URL.createObjectURL(blob);
+
+      // 4. Crear un enlace 'a' oculto en el DOM
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename; // Define el nombre con el que se guardará
+
+      // 5. Simular el clic en el enlace para iniciar la descarga
+      document.body.appendChild(link);
+      link.click();
+
+      // 6. Limpiar el DOM y liberar la memoria ocupada por la URL temporal
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("No se pudo guardar la imagen:", error);
+      alert("Hubo un problema al guardar la imagen.");
+    }
+  };
 
   const subtitle =
     role == "paciente"

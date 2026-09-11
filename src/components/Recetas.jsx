@@ -26,7 +26,7 @@ function Recetas({
         <h2 className="recetas-title">{title}</h2>
         <div className="recetas-list">
           {recetas.length === 0 ? (
-            <div className="recetas-empty" role="status">
+            <div className="recetas-empty">
               <span className="recetas-empty-icon" aria-hidden="true">
                 ✦
               </span>
@@ -75,11 +75,16 @@ function Recetas({
                     <button
                       className="receta-action receta-action-secondary"
                       type="button"
-                      onClick={() => handleDownload(e.image)}
+                      onClick={() =>
+                        handleDownload(
+                          `${API_BASE_URL}${e.image.filepath}`,
+                          e.image.filename || `${e.receta.nombre}.jpg`,
+                        )
+                      }
                     >
                       Descargar imagen
                     </button>
-                    {rol !== "paciente" && (
+                    {rol !== "paciente" && false && (
                       <button
                         className="receta-action receta-action-primary"
                         type="button"
