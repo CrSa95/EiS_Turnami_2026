@@ -1,7 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
@@ -12,6 +11,11 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
+          target: API_TARGET,
+          changeOrigin: true,
+        },
+        // Redirige llamadas a /uploads hacia el backend
+        '/uploads': {
           target: API_TARGET,
           changeOrigin: true,
         },
