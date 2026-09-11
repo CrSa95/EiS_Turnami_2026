@@ -26,6 +26,7 @@ function HomePage() {
 
   const [state, setState] = useState("NONE");
   const [recetas, setRecetas] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     if (!session) return;
@@ -73,7 +74,7 @@ function HomePage() {
     navigate("/", { replace: true });
   };
 
-  const handleImage = async (file) => {
+  const handleUploadImage = async (file) => {
     setState(States.Loading);
     try {
       await patientUploadImage(session.access_token, file);
@@ -86,7 +87,47 @@ function HomePage() {
           image,
         })),
       );
+      return true;
     } catch (error) {
+      setState(States.Error);
+      return false;
+    }
+  };
+
+  const handleViewImage = (image) => {
+    if (selectedImage) {
+      setSelectedImage(null);
+    } else {
+      setSelectedImage(image);
+    }
+  };
+
+  const handleDownload = async (url, filename = "imagen-descargada.jpg") => {
+    try {
+      // 1. Obtener la información de la imagen
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Error al descargar la imagen");
+
+      // 2. Convertir la respuesta a un Blob (Binary Large Object)
+      const blob = await response.blob();
+
+      // 3. Crear una URL local temporal para ese Blob
+      const blobUrl = URL.createObjectURL(blob);
+
+      // 4. Crear un enlace 'a' oculto en el DOM
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename; // Define el nombre con el que se guardará
+
+      // 5. Simular el clic en el enlace para iniciar la descarga
+      document.body.appendChild(link);
+      link.click();
+
+      // 6. Limpiar el DOM y liberar la memoria ocupada por la URL temporal
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("No se pudo guardar la imagen:", error);
       setState(States.Error);
     }
   };
@@ -102,7 +143,14 @@ function HomePage() {
         subtitle={subtitle}
         handleLogout={handleLogout}
       />
-      <Recetas recetas={recetas} rol={role} handleImage={handleImage} />
+      <Recetas
+        recetas={recetas}
+        rol={role}
+        handleUploadImage={handleUploadImage}
+        handleViewImage={handleViewImage}
+        handleDownload={handleDownload}
+        selectedImage={selectedImage}
+      />
       <ModalState state={state} setState={setState} />
     </main>
   );
