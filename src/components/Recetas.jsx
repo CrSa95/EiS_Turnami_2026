@@ -7,7 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 function Recetas({
   rol,
   recetas,
-  handleImage,
+  handleUploadImage,
   handleViewImage,
   handleDownload,
   selectedImage,
@@ -19,7 +19,7 @@ function Recetas({
     <div className="recetas-layout">
       {rol === "paciente" && (
         <div className="recetas">
-          <CargarReceta handleImage={handleImage} />
+          <CargarReceta handleUploadImage={handleUploadImage} />
         </div>
       )}
       <div className="recetas">

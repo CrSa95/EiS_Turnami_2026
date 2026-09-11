@@ -74,7 +74,7 @@ function HomePage() {
     navigate("/", { replace: true });
   };
 
-  const handleImage = async (file) => {
+  const handleUploadImage = async (file) => {
     setState(States.Loading);
     try {
       await patientUploadImage(session.access_token, file);
@@ -87,8 +87,10 @@ function HomePage() {
           image,
         })),
       );
+      return true;
     } catch (error) {
       setState(States.Error);
+      return false;
     }
   };
 
@@ -126,7 +128,7 @@ function HomePage() {
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error("No se pudo guardar la imagen:", error);
-      alert("Hubo un problema al guardar la imagen.");
+      setState(States.Error);
     }
   };
 
@@ -144,7 +146,7 @@ function HomePage() {
       <Recetas
         recetas={recetas}
         rol={role}
-        handleImage={handleImage}
+        handleUploadImage={handleUploadImage}
         handleViewImage={handleViewImage}
         handleDownload={handleDownload}
         selectedImage={selectedImage}

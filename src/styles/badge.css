@@ -1,25 +1,29 @@
 .badge {
-	display: inline-flex;
-	align-items: center;
-	width: fit-content;
-	padding: 4px 10px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .badge-disponible {
-	color: #047857;
-	background: #d1fae5;
+  color: #047857;
+  background: #d1fae5;
 }
 
 .badge-cancelado {
-	color: #dc2626;
-	background: #fee2e2;
+  color: #dc2626;
+  background: #fee2e2;
 }
 
 .badge-pendiente {
-	color: #b45309;
-	background: #fef3c7;
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.nare {
+  background-color: #4977dbde;
 }
