@@ -72,18 +72,20 @@ function Recetas({
                     >
                       {!selectedImage ? "Ver receta" : "Cerrar vista"}
                     </button>
-                    <button
-                      className="receta-action receta-action-secondary"
-                      type="button"
-                      onClick={() =>
-                        handleDownload(
-                          `${API_BASE_URL}${e.image.filepath}`,
-                          e.image.filename || `${e.receta.nombre}.jpg`,
-                        )
-                      }
-                    >
-                      Descargar imagen
-                    </button>
+                    {false && (
+                      <button
+                        className="receta-action receta-action-secondary"
+                        type="button"
+                        onClick={() =>
+                          handleDownload(
+                            `${API_BASE_URL}${e.image.filepath}`,
+                            e.image.filename || `${e.receta.nombre}.jpg`,
+                          )
+                        }
+                      >
+                        Descargar imagen
+                      </button>
+                    )}
                     {rol !== "paciente" && false && (
                       <button
                         className="receta-action receta-action-primary"
