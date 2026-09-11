@@ -101,18 +101,7 @@ export function patientUploadImage(accessToken, file) {
     body: formData,
   });
 }
-
-export function doctorPatientsImages(accessToken, pacienteId) {
-  if (!pacienteId) {
-    return Promise.reject(new Error("El DNI del paciente es obligatorio."));
-  }
-
-  return requestEndpoint(endpoints.doctorPatientImages(pacienteId), {
-    method: "GET",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-}
-
+ 
 export function patientImages(accessToken) {
   return requestEndpoint(endpoints.patientImages, {
     method: "GET",

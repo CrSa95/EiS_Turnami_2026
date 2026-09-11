@@ -94,7 +94,7 @@ export default class ImageController {
     // Ver imágenes de un paciente específico por DNI (Método restaurado para el test)
     public getImagesByPaciente = async (req: Request, res: Response): Promise<void> => {
         try {
-            const pacienteDni = req.params.pacienteDni as string;
+            const pacienteDni = req.params.pacienteDni || (req as any).user?.dni;
             if (!pacienteDni) {
                 res.status(400).json({ message: 'El DNI de paciente no es válido' });
                 return;
