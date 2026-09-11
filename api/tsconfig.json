@@ -11,10 +11,10 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "multer"],
     "isolatedModules": true,
     "declaration": false,
-    "removeComments": true
+    "removeComments": true,
   },
   "include": ["src/**/*"],
 "exclude": ["node_modules", "dist", "tests/**/*"]
