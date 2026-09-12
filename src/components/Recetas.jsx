@@ -57,14 +57,14 @@ function Recetas({
                   {rol !== "paciente" ? (
                     <p className="receta-details">
                       {e.paciente.nombre} {e.paciente.apellido} ·{" "}
-                      {e.receta.fecha}
+                      {e.receta.fecha} · {e.paciente.dni}
                     </p>
                   ) : (
                     <p className="receta-details">{e.receta.fecha}</p>
                   )}
 
                   <div className="receta-actions">
-                    <Badge />
+                    <Badge status={e.status} />
                     <button
                       className="receta-action receta-action-secondary"
                       type="button"
