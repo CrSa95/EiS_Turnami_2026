@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { States } from "../pages/HomePage";
-import Modal from "./modal";
+import Modal from "./Modal";
 
 function ModalState({ state, setState }) {
 
