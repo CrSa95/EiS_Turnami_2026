@@ -47,6 +47,7 @@ function HomePage() {
         setRecetas(
           images.map((image) => ({
             paciente: {
+              dni: image.dniPaciente,
               nombre:
                 image.paciente?.split(" ")[0] || image.paciente || "Paciente",
               apellido: image.paciente?.split(" ").slice(1).join(" ") || "",
@@ -54,6 +55,7 @@ function HomePage() {
             receta: {
               nombre: image.idReceta,
               fecha: image.fechaCarga || image.createdAt || "",
+              estado: image.estado,
             },
             image,
           })),
