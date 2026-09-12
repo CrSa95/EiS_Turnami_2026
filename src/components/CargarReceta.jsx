@@ -2,9 +2,12 @@ import { useRef, useState } from "react";
 import "../styles/cargarReceta.css";
 
 function CargarReceta({ handleUploadImage }) {
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/png"]);
   const [uploaded, setUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
   const handleUpload = () => fileInputRef.current?.click();
@@ -12,6 +15,30 @@ function CargarReceta({ handleUploadImage }) {
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    const allowedExtensions = ["jpg", "jpeg", "png"];
+
+    if (
+      !allowedExtensions.includes(fileExtension) ||
+      !ALLOWED_FILE_TYPES.has(file.type)
+    ) {
+      setError("El archivo debe ser una imagen JPG, JPEG o PNG.");
+      setFile(null);
+      setUploaded(false);
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError("La imagen no puede superar los 5 MB.");
+      setFile(null);
+      setUploaded(false);
+      event.target.value = "";
+      return;
+    }
+
+    setError("");
     setUploading(true);
     setFile(file);
     window.setTimeout(() => {
@@ -39,6 +66,7 @@ function CargarReceta({ handleUploadImage }) {
         Sube únicamente una foto de tu documento (formato JPG, JPEG o PNG). No
         se aceptan archivos PDF ni documentos de texto.
       </label>
+      {error && <p className="upload-error">{error}</p>}
       <input
         ref={fileInputRef}
         id="receta-file"
