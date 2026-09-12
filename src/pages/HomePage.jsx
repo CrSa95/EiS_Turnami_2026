@@ -17,6 +17,21 @@ export const States = {
   Loading: "Loading",
 };
 
+const formatRecipeDate = (value) => {
+  if (!value) return "";
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    timeZone: "America/Argentina/Buenos_Aires",
+  }).format(date);
+};
+
 function HomePage() {
   const [session, setSession] = useState(() => {
     const storedSession = localStorage.getItem("turnami-session");
@@ -54,7 +69,7 @@ function HomePage() {
             },
             receta: {
               nombre: image.idReceta,
-              fecha: image.fechaCarga || image.createdAt || "",
+              fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
               estado: image.estado,
             },
             image,
@@ -85,7 +100,10 @@ function HomePage() {
       setRecetas(
         images.map((image) => ({
           paciente: { nombre: "", apellido: "" },
-          receta: { nombre: image.idReceta, fecha: image.createdAt || "" },
+          receta: {
+            nombre: image.idReceta,
+            fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
+          },
           image,
         })),
       );
