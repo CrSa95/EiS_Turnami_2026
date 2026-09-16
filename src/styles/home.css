@@ -42,8 +42,44 @@
 .home-welcome h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 6vw, 72px); line-height: 1.08; }
 .home-welcome > p:last-child { color: #5f6f8f; font-size: 17px; }
 
+/* Tablet */
+@media (min-width: 561px) and (max-width: 1024px) {
+  .home-header,
+  .home-welcome {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+
+  .home-welcome {
+    margin-top: 10vh;
+  }
+}
+
+/* Celular */
 @media (max-width: 560px) {
-  .home-header, .home-welcome { padding-right: 24px; padding-left: 24px; }
-  .home-header { padding-top: 24px; }
-  .home-welcome { margin-top: 12vh; }
+  .home-header,
+  .home-welcome {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .home-header {
+    align-items: flex-start;
+    gap: 16px;
+    padding-top: 20px;
+  }
+
+  .home-brand {
+    font-size: 21px;
+  }
+
+  .home-header button {
+    flex-shrink: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .home-welcome {
+    margin-top: 12vh;
+  }
 }
