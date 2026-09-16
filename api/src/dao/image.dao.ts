@@ -18,4 +18,16 @@ export default class ImageDAO {
             estado: 'Pendiente'
         }).sort({ createdAt: -1 });
     }
+
+    async updateStatus(idReceta: string, nuevoEstado: string): Promise<IImage | null> {
+        try {
+            return await ImageModel.findOneAndUpdate(
+                { idReceta },
+                { estado: nuevoEstado },
+                { new: true }
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
 }
