@@ -11,4 +11,9 @@ export default class ImageService {
         const updatedImage = await this.imageDAO.updateStatus(idReceta, 'Transcripta');
         return updatedImage;
     }
+
+    public async rejectRecipe(idReceta: string) {
+        const updatedImage = await this.imageDAO.updateStatus(idReceta, 'Rechazada');
+        return updatedImage;
+    }
 }
