@@ -1,6 +1,7 @@
 import "../styles/recetas.css";
 import Badge from "./Badge";
 import CargarReceta from "./CargarReceta";
+import RecetaImageModal from "./RecetaImageModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -70,7 +71,7 @@ function Recetas({
                       type="button"
                       onClick={() => handleViewImage(e.image)}
                     >
-                      {!selectedImage ? "Ver receta" : "Cerrar vista"}
+                      Ver receta
                     </button>
                     {false && (
                       <button
@@ -91,25 +92,25 @@ function Recetas({
                         className="receta-action receta-action-primary"
                         type="button"
                       >
-                        Aprobar transcriptcion
+                        Aprobar transcripcion
                       </button>
                     )}
                   </div>
 
-                  {selectedImage === e.image && e.image?.filepath && (
-                    <div className="receta-image">
-                      <img
-                        src={`${API_BASE_URL}${e.image.filepath}`}
-                        alt={`Receta ${e.receta.nombre}`}
-                      />
-                    </div>
-                  )}
                 </div>
               </article>
             ))
           )}
         </div>
       </div>
+
+      {selectedImage?.filepath && (
+        <RecetaImageModal
+          src={`${API_BASE_URL}${selectedImage.filepath}`}
+          alt="Vista previa de la receta"
+          onClose={() => handleViewImage(selectedImage)}
+        />
+      )}
     </div>
   );
 }
