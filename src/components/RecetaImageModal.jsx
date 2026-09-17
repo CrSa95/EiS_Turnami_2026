@@ -79,9 +79,14 @@ function RecetaImageModal({ src, alt, onClose }) {
   const stopDragging = () => setIsDragging(false);
 
   useEffect(() => {
+    if (!isDragging) return;
+    window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", stopDragging);
-    return () => window.removeEventListener("mouseup", stopDragging);
-  }, []);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", stopDragging);
+    };
+  }, [isDragging]);
 
   const handleBackdropMouseDown = (event) => {
     backdropMouseDownRef.current = event.target === event.currentTarget;
@@ -115,9 +120,6 @@ function RecetaImageModal({ src, alt, onClose }) {
           className={`receta-image-modal-viewport${isDragging ? " dragging" : ""}`}
           ref={viewportRef}
           onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={stopDragging}
-          onMouseLeave={stopDragging}
         >
           <img
             ref={imgRef}
