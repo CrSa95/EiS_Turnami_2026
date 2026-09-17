@@ -8,6 +8,8 @@ const endpoints = {
   doctorPendingImages: `${API_BASE_URL}/api/v1/medico/recetas-pendientes`,
   doctorPatientImages: (pacienteDni) =>
     `${API_BASE_URL}/api/v1/medico/paciente/${pacienteDni}/images`,
+  transcribeRecipe: (idReceta) =>
+    `${API_BASE_URL}/api/v1/medico/images/${idReceta}/transcribir`,
 };
 
 const TEST_SESSION = {
@@ -113,5 +115,15 @@ export function doctorPendingImages(accessToken) {
   return requestEndpoint(endpoints.doctorPendingImages, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function transcribeRecipe(accessToken, idReceta) {
+  return requestEndpoint(endpoints.transcribeRecipe(idReceta), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
 }
