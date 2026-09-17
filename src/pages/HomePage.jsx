@@ -4,6 +4,7 @@ import {
   doctorPendingImages,
   patientImages,
   patientUploadImage,
+  transcribeRecipe,
   validateSession,
 } from "../data/auth";
 import "../styles/home.css";
@@ -152,6 +153,34 @@ function HomePage() {
     }
   };
 
+     const handleTranscribeRecipe = async (idReceta) => {
+        if (!idReceta) return;
+
+        setState(States.Loading);
+
+        try {
+          await transcribeRecipe(session.access_token, idReceta);
+        
+          setRecetas((prev) =>
+            prev.filter(
+              (item) =>
+                item.image?.idReceta !== idReceta
+            )
+          );
+        
+          setState({
+            type: States.Ok,
+            message: "La receta ha sido marcada como transcripta correctamente.",
+          });
+        } catch (error) {
+        
+          setState({
+            type: States.Error,
+            message: error.message || "Error al conectar con el servidor.",
+          });
+        }
+      };
+
   const subtitle =
     role == "paciente"
       ? `Visualiza y envia tus recetas`
@@ -169,6 +198,7 @@ function HomePage() {
         handleUploadImage={handleUploadImage}
         handleViewImage={handleViewImage}
         handleDownload={handleDownload}
+        handleTranscribeRecipe={handleTranscribeRecipe}
         selectedImage={selectedImage}
       />
       <ModalState state={state} setState={setState} />
