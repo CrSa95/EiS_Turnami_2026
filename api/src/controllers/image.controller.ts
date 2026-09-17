@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
 import ImageDAO from '../dao/image.dao.js';
 import PacienteDAO from '../dao/paciente.dao.js';
+import ImageService from '../services/image.service.js';
 
 export default class ImageController {
     private imageDAO: ImageDAO;
     private pacienteDAO: PacienteDAO;
+    private imageService: ImageService;
 
-    constructor(imageDAO: ImageDAO, pacienteDAO: PacienteDAO) {
+    constructor(imageDAO: ImageDAO, pacienteDAO: PacienteDAO, imageService: ImageService) {
         this.imageDAO = imageDAO;
         this.pacienteDAO = pacienteDAO;
+        this.imageService = imageService;
     }
 
     // Subir imagen (Acción del Paciente logueado)
@@ -112,12 +115,12 @@ export default class ImageController {
         try {
             const { idReceta } = req.params;
 
-            if (!idReceta) {
+            if (!idReceta || typeof idReceta !== 'string') {
                 res.status(400).json({ message: 'El ID de la receta es requerido' });
                 return;
             }
 
-            const updatedImage = await this.imageDAO.updateStatus(idReceta as string, 'Transcripta');
+            const updatedImage = await this.imageService.transcribeRecipe(idReceta);
 
             if (!updatedImage) {
                 res.status(404).json({ message: 'No se encontró la receta solicitada' });
