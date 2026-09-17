@@ -112,4 +112,78 @@ describe("ImageController - transcribeRecipe (Integration)", () => {
         });
       });
     });
+
+    describe("rejectRecipe", () => {
+      it('debería retornar 200 OK y la receta con estado "Rechazada" cuando se provee un idReceta válido', async () => {
+        const mockIdReceta = "R1234";
+        req = { params: { idReceta: mockIdReceta } };
+      
+        const rejectedImageMock = {
+          idReceta: mockIdReceta,
+          filename: "receta.jpg",
+          filepath: "/uploads/receta.jpg",
+          mimetype: "image/jpeg",
+          size: 1024,
+          pacienteDni: "12345678",
+          estado: "Rechazada",
+        };
+      
+        jest.spyOn(mockImageService, "rejectRecipe").mockResolvedValue(rejectedImageMock as any);
+      
+        await imageController.rejectRecipe(req as Request, res as Response);
+      
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+          message: "La receta ha sido rechazada correctamente",
+          image: rejectedImageMock,
+        });
+        expect(mockImageService.rejectRecipe).toHaveBeenCalledWith(mockIdReceta);
+      });
+    
+      it.each([
+        { description: "sin idReceta", params: {} },
+        { description: "string vacío", params: { idReceta: "" } },
+        { description: "solo espacios", params: { idReceta: "   " } },
+        { description: "número en lugar de string", params: { idReceta: 1234 } },
+      ])("debería retornar 400 Bad Request cuando idReceta es $description", async ({ params }) => {
+        req = { 
+          params: params as Record<string, any> 
+        };
+      
+        await imageController.rejectRecipe(req as Request, res as Response);
+      
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+          message: "El ID de la receta es requerido",
+        });
+      });
+    
+      it("debería retornar 404 Not Found si la receta no existe en la BD", async () => {
+        req = { params: { idReceta: "R9999" } };
+        jest.spyOn(mockImageService, "rejectRecipe").mockResolvedValue(null as any);
+      
+        await imageController.rejectRecipe(req as Request, res as Response);
+      
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+          message: "No se encontró la receta solicitada",
+        });
+      });
+    
+      it("debería retornar 500 Internal Server Error cuando ocurre una excepción en el servicio", async () => {
+        req = { params: { idReceta: "R1234" } };
+        const dbError = new Error("DB connection failed");
+        jest.spyOn(mockImageService, "rejectRecipe").mockRejectedValue(dbError);
+      
+        await imageController.rejectRecipe(req as Request, res as Response);
+      
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+          message: "Error al rechazar la receta",
+          error: dbError,
+        });
+      });
+    });
+
+    
 });
