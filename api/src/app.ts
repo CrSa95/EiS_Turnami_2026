@@ -11,13 +11,15 @@ import jwt from 'jsonwebtoken';
 // Importamos el DAO y Controlador de imágenes para mantener la arquitectura de capas
 import ImageDAO from './dao/image.dao.js';
 import PacienteDAO from './dao/paciente.dao.js';
+import ImageService from './services/image.service.js';
 import ImageController from './controllers/image.controller.js';
 
 const app: Application = express();
 // Instanciamos el DAO y el Controlador de imágenes
 const imageDAO = new ImageDAO();
 const pacienteDAO = new PacienteDAO(); // Inyectamos el DAO de Paciente
-const imageController = new ImageController(imageDAO, pacienteDAO);
+const imageService = new ImageService(imageDAO);
+const imageController = new ImageController(imageDAO, pacienteDAO, imageService);
 
 app.use(cors());
 app.use(express.json());
@@ -141,6 +143,12 @@ app.get(
   "/api/v1/medico/paciente/:pacienteDni/images",
   verificarTokenMedico,
   imageController.getImagesByPaciente,
+);
+
+app.patch(
+  "/api/v1/medico/images/:idReceta/transcribir",
+  verificarTokenMedico,
+  imageController.transcribeRecipe,
 );
 
 export default app;
