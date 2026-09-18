@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import "../styles/modal.css";
 
@@ -13,41 +13,65 @@ function ModalReject({
   onSuccess,
   rejectRecipeApi,
 }) {
-  const [motivo, setMotivo] = useState(DEFAULT_MOTIVO);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-
-  if (!isOpen) return null;
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    setErrorMessage(null);
-
-    try {
-      await rejectRecipeApi(token, recipeId, motivo);
-      setLoading(false);
-      onSuccess(recipeId);
-      onClose();
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage("No se pudo rechazar la receta. Intente nuevamente.");
-    }
-  };
-
-  const handleCloseError = () => {
-    setErrorMessage(null);
-    onClose();
-  };
-
-  if (loading) {
-    return <Modal status="Cargando" message="Procesando la solicitud de rechazo..." />;
-  }
-
-  if (errorMessage) {
-    return (
-      <Modal status="Fallo" message={errorMessage} onClose={handleCloseError} />
-    );
-  }
+      const [motivo, setMotivo] = useState(DEFAULT_MOTIVO);
+      const [loading, setLoading] = useState(false);
+      const [errorMessage, setErrorMessage] = useState(null);
+      const [validationError, setValidationError] = useState("");
+    
+      useEffect(() => {
+        if (isOpen) {
+          setMotivo(DEFAULT_MOTIVO);
+          setValidationError("");
+          setErrorMessage(null);
+          setLoading(false);
+        }
+      }, [isOpen]);
+    
+      if (!isOpen) return null;
+    
+      const handleConfirm = async () => {
+        setValidationError("");
+        setErrorMessage(null);
+      
+        const trimmedMotivo = motivo.trim();
+        if (!trimmedMotivo) {
+          setValidationError("El motivo de rechazo no puede estar vacío.");
+          return;
+        }
+      
+        if (trimmedMotivo.length > 200) {
+          setValidationError("El motivo no puede superar los 200 caracteres.");
+          return;
+        }
+      
+        setLoading(true);
+        setErrorMessage(null);
+      
+        try {
+          await rejectRecipeApi(token, recipeId, motivo);
+          setLoading(false);
+          onSuccess(recipeId);
+          onClose();
+        } catch (error) {
+          setLoading(false);
+          setErrorMessage("No se pudo rechazar la receta. Intente nuevamente.");
+        }
+      };
+    
+      const handleCloseError = () => {
+        setErrorMessage(null);
+        onClose();
+      };
+    
+      if (loading) {
+        return <Modal status="Cargando" message="Procesando la solicitud de rechazo..." />;
+      }
+    
+      if (errorMessage) {
+        return (
+          <Modal status="Fallo" message={errorMessage} onClose={handleCloseError} />
+        );
+      }
 
   return (
     <div className="status-modal-backdrop">
@@ -57,8 +81,12 @@ function ModalReject({
 
         <textarea
           value={motivo}
-          onChange={(e) => setMotivo(e.target.value)}
+          onChange={(e) => {
+            setMotivo(e.target.value);
+            if (validationError) setValidationError("");
+          }}
           rows={4}
+          maxLength={200}
           style={{
             width: "100%",
             marginTop: "12px",
@@ -69,6 +97,17 @@ function ModalReject({
             boxSizing: "border-box",
           }}
         />
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+          {validationError ? (
+            <span style={{ color: "red", fontSize: "12px" }}>{validationError}</span>
+          ) : (
+            <span />
+          )}
+          <span style={{ fontSize: "12px", color: motivo.length > 200 ? "red" : "#666" }}>
+            {motivo.length}/200
+          </span>
+        </div>
 
         <div
           style={{
