@@ -176,7 +176,7 @@ function HomePage() {
         
           setState({
             type: States.Error,
-            message: error.message || "Error al conectar con el servidor.",
+            message: "No se pudo marcar la receta como transcripta. Intente nuevamente."
           });
         }
       };
