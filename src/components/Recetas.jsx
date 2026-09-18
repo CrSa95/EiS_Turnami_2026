@@ -11,6 +11,7 @@ function Recetas({
   handleViewImage,
   handleDownload,
   handleTranscribeRecipe,
+  handleRejectRecipe,
   selectedImage,
 }) {
   const title =
@@ -98,6 +99,19 @@ function Recetas({
                          }}
                        >
                          Marcar como transcripta
+                       </button>
+                    )}
+
+                    {rol !== "paciente" && (
+                       <button
+                         className="receta-action receta-action-primary"
+                         type="button"
+                         onClick={() => {
+                           const id = e.image?.idReceta;
+                           handleRejectRecipe(id);
+                         }}
+                       >
+                         Rechazar
                        </button>
                     )}
 

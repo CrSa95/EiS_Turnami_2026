@@ -4,6 +4,7 @@ import {
   doctorPendingImages,
   patientImages,
   patientUploadImage,
+  rejectRecipe,
   transcribeRecipe,
   validateSession,
 } from "../data/auth";
@@ -11,6 +12,7 @@ import "../styles/home.css";
 import Recetas from "../components/Recetas";
 import Navigation from "../components/Navigation";
 import ModalState from "../components/ModalStates";
+import ModalReject from "../components/ModalReject";
 
 export const States = {
   Error: "Error",
@@ -43,6 +45,7 @@ function HomePage() {
   const [state, setState] = useState("NONE");
   const [recetas, setRecetas] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [rejectRecipeId, setRejectRecipeId] = useState(null);
 
   useEffect(() => {
     if (!session) return;
@@ -176,9 +179,24 @@ function HomePage() {
         
           setState({
             type: States.Error,
-            message: error.message || "Error al conectar con el servidor.",
+            message: "No se pudo marcar la receta como transcripta. Intente nuevamente."
           });
         }
+      };
+
+      const handleOpenRejectModal = (idReceta) => {
+        if (idReceta) setRejectRecipeId(idReceta);
+      };
+
+      const handleRejectSuccess = (idReceta) => {
+        setRecetas((prev) =>
+          prev.filter((item) => item.image?.idReceta !== idReceta),
+        );
+      
+        setState({
+          type: States.Ok,
+          message: "La receta ha sido rechazada correctamente.",
+        });
       };
 
   const subtitle =
@@ -199,8 +217,19 @@ function HomePage() {
         handleViewImage={handleViewImage}
         handleDownload={handleDownload}
         handleTranscribeRecipe={handleTranscribeRecipe}
+        handleRejectRecipe={handleOpenRejectModal}
         selectedImage={selectedImage}
       />
+
+      <ModalReject
+        isOpen={Boolean(rejectRecipeId)}
+        recipeId={rejectRecipeId}
+        token={session.access_token}
+        onClose={() => setRejectRecipeId(null)}
+        onSuccess={handleRejectSuccess}
+        rejectRecipeApi={rejectRecipe}
+      />
+
       <ModalState state={state} setState={setState} />
     </main>
   );
