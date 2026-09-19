@@ -1,189 +1,212 @@
-import { jest, describe, it, beforeEach, expect } from "@jest/globals";
+import { jest, describe, it, beforeEach, afterEach, beforeAll, afterAll, expect } from "@jest/globals";
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import ImageController from "../../src/controllers/image.controller.js";
 import ImageService from "../../src/services/image.service.js";
 import ImageDAO from "../../src/dao/image.dao.js";
 import PacienteDAO from "../../src/dao/paciente.dao.js";
+import ImageModel from "../../src/model/image.model.js";
 
-jest.mock("../../src/services/image.service.js");
+describe("ImageController - (Tests de integración)", () => {
+  let imageController: ImageController;
+  let imageService: ImageService;
+  let imageDAO: ImageDAO;
+  let pacienteDAO: PacienteDAO;
+  let req: Partial<Request>;
+  let res: Partial<Response>;
 
-describe("ImageController - transcribeRecipe (Integration)", () => {
-    let imageController: ImageController;
-    let mockImageService: ImageService;
-    let mockImageDAO: ImageDAO;
-    let mockPacienteDAO: PacienteDAO;
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-  
-    beforeEach(() => {
-      jest.clearAllMocks();
-    
-      mockImageDAO = new ImageDAO();
-      mockPacienteDAO = new PacienteDAO();
-      mockImageService = new ImageService();
-    
-      // se inyectan las 3 dependencias
-      imageController = new ImageController(mockImageDAO, mockPacienteDAO, mockImageService);
-    
-      res = {
-          status: jest.fn().mockReturnThis() as unknown as (code: number) => Response,
-          json: jest.fn().mockReturnThis() as unknown as (body?: any) => Response,
-      };
-    });
-  
-    describe("transcribeRecipe", () => {
-      it('debería retornar 200 OK y la receta con estado "Transcripta" cuando se provee un idReceta válido', async () => {
-        const mockIdReceta = "R1234";
-        req = {
-          params: {
-            idReceta: mockIdReceta,
-          },
-        };
-      
-        const updatedImageMock = {
-          idReceta: mockIdReceta,
-          filename: "receta.jpg",
-          filepath: "/uploads/receta.jpg",
-          mimetype: "image/jpeg",
-          size: 1024,
-          pacienteDni: "12345678",
-          estado: "Transcripta",
-        };
-      
-        jest.spyOn(mockImageService, "transcribeRecipe").mockResolvedValue(updatedImageMock as any);
-      
-        await imageController.transcribeRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({
+  const TEST_RECIPE_ID = "R-TEST-123";
+
+  beforeAll(async () => {
+    const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/turnami_test";
+    await mongoose.connect(mongoUri);
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
+
+  beforeEach(async () => {
+    imageDAO = new ImageDAO();
+    pacienteDAO = new PacienteDAO();
+    imageService = new ImageService(imageDAO);
+    imageController = new ImageController(imageDAO, pacienteDAO, imageService);
+
+    res = {
+      status: jest.fn().mockReturnThis() as unknown as (code: number) => Response,
+      json: jest.fn().mockReturnThis() as unknown as (body?: any) => Response,
+    };
+
+    await ImageModel.deleteOne({ idReceta: TEST_RECIPE_ID });
+  });
+
+  afterEach(async () => {
+    await ImageModel.deleteOne({ idReceta: TEST_RECIPE_ID });
+  });
+
+  // ==========================================
+  // TESTS: transcribeRecipe
+  // ==========================================
+  describe("transcribeRecipe", () => {
+    it("debería actualizar el estado a 'Transcripta' en la BD y retornar 200 OK", async () => {
+      await imageDAO.create({
+        idReceta: TEST_RECIPE_ID,
+        filename: "test.jpg",
+        filepath: "/uploads/test.jpg",
+        mimetype: "image/jpeg",
+        size: 1024,
+        pacienteDni: "12345678",
+        estado: "Pendiente",
+      });
+
+      req = { params: { idReceta: TEST_RECIPE_ID } };
+
+      await imageController.transcribeRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
           message: "La receta ha sido marcada como transcripta correctamente",
-          image: updatedImageMock,
-        });
-        expect(mockImageService.transcribeRecipe).toHaveBeenCalledWith(mockIdReceta);
-      });
+        })
+      );
+
+      const updatedImage = await ImageModel.findOne({ idReceta: TEST_RECIPE_ID });
+      expect(updatedImage?.estado).toBe("Transcripta");
+    });
+
+    it.each([
+      { desc: "undefined", params: {} },
+      { desc: "string vacío", params: { idReceta: "" } },
+      { desc: "solo espacios", params: { idReceta: "   " } },
+      { desc: "tipo no string", params: { idReceta: 123 } },
+    ])("debería retornar 400 Bad Request cuando idReceta es $desc", async ({ params }) => {
+      req = { params: params as any };
     
-      it("debería retornar 400 Bad Request si no se proporciona el idReceta en req.params", async () => {
-        req = {
-          params: {},
-        };
-      
-        await imageController.transcribeRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "El ID de la receta es requerido",
-        });
-      });
+      await imageController.transcribeRecipe(req as Request, res as Response);
     
-      it("debería retornar 404 Not Found si la receta no existe en la BD", async () => {
-        const mockIdReceta = "R9999";
-        req = {
-          params: {
-            idReceta: mockIdReceta,
-          },
-        };
-      
-        jest.spyOn(mockImageService, "transcribeRecipe").mockResolvedValue(null as any);
-      
-        await imageController.transcribeRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "No se encontró la receta solicitada",
-        });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "El ID de la receta es requerido",
       });
-    
-      it("debería retornar 500 Internal Server Error cuando ocurre una excepción en el servicio", async () => {
-        req = {
-          params: {
-            idReceta: "R1234",
-          },
-        };
-      
-        const dbError = new Error("DB connection failed");
-        jest.spyOn(mockImageService, "transcribeRecipe").mockRejectedValue(dbError);
-      
-        await imageController.transcribeRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "Error al marcar la receta como transcripta",
-          error: dbError,
-        });
+    }); 
+
+    it("debería retornar 404 Not Found si la receta no existe en la BD", async () => {
+      req = { params: { idReceta: "R-INEXISTENTE-999" } };
+
+      await imageController.transcribeRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "No se encontró la receta solicitada",
       });
     });
 
-    describe("rejectRecipe", () => {
-      it('debería retornar 200 OK y la receta con estado "Rechazada" cuando se provee un idReceta válido', async () => {
-        const mockIdReceta = "R1234";
-        req = { params: { idReceta: mockIdReceta } };
-      
-        const rejectedImageMock = {
-          idReceta: mockIdReceta,
-          filename: "receta.jpg",
-          filepath: "/uploads/receta.jpg",
-          mimetype: "image/jpeg",
-          size: 1024,
-          pacienteDni: "12345678",
-          estado: "Rechazada",
-        };
-      
-        jest.spyOn(mockImageService, "rejectRecipe").mockResolvedValue(rejectedImageMock as any);
-      
-        await imageController.rejectRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({
+    it("debería retornar 500 Internal Server Error si ocurre una falla en el servicio/BD", async () => {
+      req = { params: { idReceta: TEST_RECIPE_ID } };
+      const errorSimulado = new Error("Error de conexión a la base de datos");
+
+      jest.spyOn(imageService, "transcribeRecipe").mockRejectedValueOnce(errorSimulado);
+
+      await imageController.transcribeRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "Error al marcar la receta como transcripta",
+        error: errorSimulado,
+      });
+    });
+  });
+
+  // ==========================================
+  // TESTS: rejectRecipe
+  // ==========================================
+  describe("rejectRecipe", () => {
+    it("debería actualizar el estado a 'Rechazada' en la BD y retornar 200 OK", async () => {
+      await imageDAO.create({
+        idReceta: TEST_RECIPE_ID,
+        filename: "test.jpg",
+        filepath: "/uploads/test.jpg",
+        mimetype: "image/jpeg",
+        size: 1024,
+        pacienteDni: "12345678",
+        estado: "Pendiente",
+      });
+
+      req = { params: { idReceta: TEST_RECIPE_ID } };
+
+      await imageController.rejectRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
           message: "La receta ha sido rechazada correctamente",
-          image: rejectedImageMock,
-        });
-        expect(mockImageService.rejectRecipe).toHaveBeenCalledWith(mockIdReceta);
+        })
+      );
+
+      const updatedImage = await ImageModel.findOne({ idReceta: TEST_RECIPE_ID });
+      expect(updatedImage?.estado).toBe("Rechazada");
+    });
+
+    it("debería limpiar espacios en blanco (trim) del idReceta al buscar", async () => {
+      await imageDAO.create({
+        idReceta: TEST_RECIPE_ID,
+        filename: "test.jpg",
+        filepath: "/uploads/test.jpg",
+        mimetype: "image/jpeg",
+        size: 1024,
+        pacienteDni: "12345678",
+        estado: "Pendiente",
       });
+
+      req = { params: { idReceta: `  ${TEST_RECIPE_ID}  ` } };
+
+      await imageController.rejectRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const updatedImage = await ImageModel.findOne({ idReceta: TEST_RECIPE_ID });
+      expect(updatedImage?.estado).toBe("Rechazada");
+    });
+
+    it.each([
+      { desc: "undefined", params: {} },
+      { desc: "string vacío", params: { idReceta: "" } },
+      { desc: "solo espacios", params: { idReceta: "   " } },
+      { desc: "tipo no string", params: { idReceta: 999 } },
+    ])("debería retornar 400 Bad Request cuando idReceta es $desc", async ({ params }) => {
+      req = { params: params as any };
     
-      it.each([
-        { description: "sin idReceta", params: {} },
-        { description: "string vacío", params: { idReceta: "" } },
-        { description: "solo espacios", params: { idReceta: "   " } },
-        { description: "número en lugar de string", params: { idReceta: 1234 } },
-      ])("debería retornar 400 Bad Request cuando idReceta es $description", async ({ params }) => {
-        req = { 
-          params: params as Record<string, any> 
-        };
-      
-        await imageController.rejectRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "El ID de la receta es requerido",
-        });
-      });
+      await imageController.rejectRecipe(req as Request, res as Response);
     
-      it("debería retornar 404 Not Found si la receta no existe en la BD", async () => {
-        req = { params: { idReceta: "R9999" } };
-        jest.spyOn(mockImageService, "rejectRecipe").mockResolvedValue(null as any);
-      
-        await imageController.rejectRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "No se encontró la receta solicitada",
-        });
-      });
-    
-      it("debería retornar 500 Internal Server Error cuando ocurre una excepción en el servicio", async () => {
-        req = { params: { idReceta: "R1234" } };
-        const dbError = new Error("DB connection failed");
-        jest.spyOn(mockImageService, "rejectRecipe").mockRejectedValue(dbError);
-      
-        await imageController.rejectRecipe(req as Request, res as Response);
-      
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-          message: "Error al rechazar la receta",
-          error: dbError,
-        });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "El ID de la receta es requerido",
       });
     });
 
-    
+    it("debería retornar 404 Not Found si la receta no existe en la BD", async () => {
+      req = { params: { idReceta: "R-INEXISTENTE-999" } };
+
+      await imageController.rejectRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "No se encontró la receta solicitada",
+      });
+    });
+
+    it("debería retornar 500 Internal Server Error si ocurre una falla en el servicio/BD", async () => {
+      req = { params: { idReceta: TEST_RECIPE_ID } };
+      const errorSimulado = new Error("Error inesperado en Mongoose");
+
+      jest.spyOn(imageService, "rejectRecipe").mockRejectedValueOnce(errorSimulado);
+
+      await imageController.rejectRecipe(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        message: "Error al rechazar la receta",
+        error: errorSimulado,
+      });
+    });
+  });
 });
