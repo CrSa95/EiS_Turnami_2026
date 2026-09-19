@@ -36,7 +36,7 @@ async function seedPacienteDePrueba() {
       password: await PasswordService.hash('1234'),
       nombre: 'Maria',
       apellido: 'Gonzalez',
-      medicoDni: "11223344"
+      medicoDni: `11223344`
     });
     console.log(' Paciente de prueba creado');
   }

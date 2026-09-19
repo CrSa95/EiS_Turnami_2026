@@ -11,6 +11,8 @@ function Recetas({
   handleUploadImage,
   handleViewImage,
   handleDownload,
+  handleTranscribeRecipe,
+  handleRejectRecipe,
   selectedImage,
 }) {
   const title =
@@ -87,14 +89,33 @@ function Recetas({
                         Descargar imagen
                       </button>
                     )}
-                    {rol !== "paciente" && false && (
-                      <button
-                        className="receta-action receta-action-primary"
-                        type="button"
-                      >
-                        Aprobar transcripcion
-                      </button>
+
+                    {rol !== "paciente" && (
+                       <button
+                         className="receta-action receta-action-primary"
+                         type="button"
+                         onClick={() => {
+                           const id = e.image?.idReceta;
+                           handleTranscribeRecipe(id);
+                         }}
+                       >
+                         Marcar como transcripta
+                       </button>
                     )}
+
+                    {rol !== "paciente" && (
+                       <button
+                         className="receta-action receta-action-primary"
+                         type="button"
+                         onClick={() => {
+                           const id = e.image?.idReceta;
+                           handleRejectRecipe(id);
+                         }}
+                       >
+                         Rechazar
+                       </button>
+                    )}
+
                   </div>
 
                 </div>

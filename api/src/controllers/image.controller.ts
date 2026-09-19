@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
 import ImageDAO from '../dao/image.dao.js';
 import PacienteDAO from '../dao/paciente.dao.js';
+import ImageService from '../services/image.service.js';
 
 export default class ImageController {
     private imageDAO: ImageDAO;
     private pacienteDAO: PacienteDAO;
+    private imageService: ImageService;
 
-    constructor(imageDAO: ImageDAO, pacienteDAO: PacienteDAO) {
+    constructor(imageDAO: ImageDAO, pacienteDAO: PacienteDAO, imageService: ImageService) {
         this.imageDAO = imageDAO;
         this.pacienteDAO = pacienteDAO;
+        this.imageService = imageService;
     }
 
     // Subir imagen (Acción del Paciente logueado)
@@ -106,4 +109,63 @@ export default class ImageController {
             res.status(500).json({ message: 'Error al obtener las imágenes del paciente', error });
         }
     };
+
+    // PATCH /api/images/:idReceta/transcribir
+    public transcribeRecipe = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { idReceta } = req.params;
+
+            if (!idReceta || typeof idReceta !== 'string' || !idReceta.trim()) {
+                res.status(400).json({ message: 'El ID de la receta es requerido' });
+                return;
+            }
+
+            const updatedImage = await this.imageService.transcribeRecipe(idReceta);
+
+            if (!updatedImage) {
+                res.status(404).json({ message: 'No se encontró la receta solicitada' });
+                return;
+            }
+
+            res.status(200).json({
+                message: 'La receta ha sido marcada como transcripta correctamente',
+                image: updatedImage
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: 'Error al marcar la receta como transcripta',
+                error
+            });
+        }
+    };
+  
+    // PATCH /api/v1/medico/images/:idReceta/rechazar
+    public rejectRecipe = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { idReceta } = req.params;
+
+            if (!idReceta || typeof idReceta !== 'string' || !idReceta.trim()) {
+                res.status(400).json({ message: 'El ID de la receta es requerido' });
+                return;
+            }
+
+           const updatedImage = await this.imageService.rejectRecipe(idReceta.trim());
+
+            if (!updatedImage) {
+                res.status(404).json({ message: 'No se encontró la receta solicitada' });
+                return;
+            }
+
+            res.status(200).json({
+                message: 'La receta ha sido rechazada correctamente',
+                image: updatedImage
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: 'Error al rechazar la receta',
+                error
+            });
+        }
+    };
+
 }
