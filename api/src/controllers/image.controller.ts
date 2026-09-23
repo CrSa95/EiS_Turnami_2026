@@ -115,12 +115,16 @@ export default class ImageController {
     public getImagesByPaciente = async (req: Request, res: Response): Promise<void> => {
         try {
             const pacienteDni = req.params.pacienteDni || (req as any).user?.dni;
+            // Se captura el estado y el tipo desde los query params de la URL
+            const estado = req.query.estado as string;
+            const tipo = req.query.tipo as string;
+
             if (!pacienteDni) {
                 res.status(400).json({ message: 'El DNI de paciente no es válido' });
                 return;
             }
 
-            const images = await this.imageDAO.findByPacienteDni(pacienteDni);
+            const images = await this.imageDAO.findByPacienteDni(pacienteDni, estado, tipo);
             res.status(200).json(images);
         } catch (error) {
             res.status(500).json({ message: 'Error al obtener las imágenes del paciente', error });

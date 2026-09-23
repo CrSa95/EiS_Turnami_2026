@@ -6,9 +6,17 @@ export default class ImageDAO {
         return await newImage.save();
     }
 
-    // Buscar imágenes de un paciente por su DNI
-    async findByPacienteDni(pacienteDni: string): Promise<IImage[]> {
-        return await ImageModel.find({ pacienteDni }).sort({ createdAt: -1 });
+    // Buscar imágenes de un paciente por su DNI, tipo de receta u orden y su estado
+    async findByPacienteDni(pacienteDni: string,estado?: string, tipo?: string): Promise<IImage[]> {
+        const query: any = { pacienteDni };
+        if (estado) {
+            query.estado = estado; // Filtra por estado.
+        }
+
+        if (tipo) {
+            query.tipo = tipo; // Filtra por 'Receta' u 'Orden'
+        }
+        return await ImageModel.find(query).sort({ createdAt: -1 });
     }
 
     // Buscar imágenes pendientes para una lista de DNIs de pacientes y el tipo de imagen
