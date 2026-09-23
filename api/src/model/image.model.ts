@@ -2,7 +2,8 @@ import mongoose, {Schema, Document, Types} from 'mongoose';
 
 //La informacion que se guarda de la imagen
 export interface IImage extends Document {
-  idReceta: string;
+  idImagen: string; // Se hace un refactor del nombre para que sea mas generico
+  tipo: 'Receta' | 'Orden'; // Nuevo campo para saber el tipo
   filename: string;
   filepath: string;
   mimetype: string;
@@ -12,7 +13,8 @@ export interface IImage extends Document {
 }
 
 const ImageSchema: Schema = new Schema({
-  idReceta: { type: String, required: true, unique: true },
+  idImagen: { type: String, required: true, unique: true },
+  tipo: { type: String, enum: ['Receta', 'Orden'], required: true },
   filename: { type: String, required: true },
   filepath: { type: String, required: true },
   mimetype: { type: String, required: true },

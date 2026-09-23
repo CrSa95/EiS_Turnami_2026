@@ -50,7 +50,7 @@ describe("ImageController - (Tests de integración)", () => {
   describe("transcribeRecipe", () => {
     it("debería actualizar el estado a 'Transcripta' en la BD y retornar 200 OK", async () => {
       await imageDAO.create({
-        idReceta: TEST_RECIPE_ID,
+        idImagen: TEST_RECIPE_ID,
         filename: "test.jpg",
         filepath: "/uploads/test.jpg",
         mimetype: "image/jpeg",
@@ -123,7 +123,7 @@ describe("ImageController - (Tests de integración)", () => {
   describe("rejectRecipe", () => {
     it("debería actualizar el estado a 'Rechazada' en la BD y retornar 200 OK", async () => {
       await imageDAO.create({
-        idReceta: TEST_RECIPE_ID,
+        idImagen: TEST_RECIPE_ID,
         filename: "test.jpg",
         filepath: "/uploads/test.jpg",
         mimetype: "image/jpeg",
@@ -149,7 +149,7 @@ describe("ImageController - (Tests de integración)", () => {
 
     it("debería limpiar espacios en blanco (trim) del idReceta al buscar", async () => {
       await imageDAO.create({
-        idReceta: TEST_RECIPE_ID,
+        idImagen: TEST_RECIPE_ID,
         filename: "test.jpg",
         filepath: "/uploads/test.jpg",
         mimetype: "image/jpeg",

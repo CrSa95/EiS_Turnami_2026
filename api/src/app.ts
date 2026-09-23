@@ -133,9 +133,9 @@ const verificarTokenMedico = (
   }
 };
 
-// Ruta para obtener el listado de recetas pendientes del médico logueado
+// Ruta para obtener el listado de recetas u ordenes pendientes del médico logueado
 app.get(
-  "/api/v1/medico/recetas-pendientes",
+  "/api/v1/medico/imagenes-pendientes",
   verificarTokenMedico,
   imageController.getPendingImagesForMedico,
 );
@@ -146,13 +146,13 @@ app.get(
 );
 
 app.patch(
-  "/api/v1/medico/images/:idReceta/transcribir",
+  "/api/v1/medico/images/:idImagen/transcribir",
   verificarTokenMedico,
   imageController.transcribeRecipe,
 );
 
 app.patch(
-  "/api/v1/medico/images/:idReceta/rechazar",
+  "/api/v1/medico/images/:idImagen/rechazar",
   verificarTokenMedico,
   imageController.rejectRecipe,
 );

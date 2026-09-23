@@ -11,18 +11,19 @@ export default class ImageDAO {
         return await ImageModel.find({ pacienteDni }).sort({ createdAt: -1 });
     }
 
-    // Buscar imágenes pendientes para una lista de DNIs de pacientes
-    async findPendingByPacientesDni(pacienteDnis: string[]): Promise<IImage[]> {
+    // Buscar imágenes pendientes para una lista de DNIs de pacientes y el tipo de imagen
+    async findPendingByPacientesDni(pacienteDnis: string[], tipoDocumento: 'Receta' | 'Orden'): Promise<IImage[]> {
         return await ImageModel.find({
             pacienteDni: { $in: pacienteDnis },
-            estado: 'Pendiente'
+            estado: 'Pendiente',
+            tipo: tipoDocumento // Filtro de recetas u ordenes
         }).sort({ createdAt: -1 });
     }
 
-    async updateStatus(idReceta: string, nuevoEstado: string): Promise<IImage | null> {
+    async updateStatus(idImagen: string, nuevoEstado: string): Promise<IImage | null> {
         try {
             return await ImageModel.findOneAndUpdate(
-                { idReceta },
+                { idImagen },
                 { estado: nuevoEstado },
                 { new: true }
             );

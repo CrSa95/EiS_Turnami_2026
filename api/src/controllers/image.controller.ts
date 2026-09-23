@@ -24,17 +24,26 @@ export default class ImageController {
 
             // DNI obtenido desde el token del middleware o el body
             const pacienteDni = (req as any).user?.dni || req.body.pacienteDni;
+            // Se obtiene el tipo desde el form-data, si no viene por defecto será 'Receta'
+            const tipo = req.body.tipo || 'Receta';
 
             if (!pacienteDni) {
                 res.status(400).json({ message: 'No se proporcionó el DNI del paciente' });
                 return;
             }
 
-            // Generar un ID de Receta personalizado (ej: R + número aleatorio de 4 dígitos)
-            const idReceta = `R${Math.floor(1000 + Math.random() * 9000)}`;
+            if (!['Receta', 'Orden'].includes(tipo)) {
+                res.status(400).json({ message: 'El tipo de documento debe ser Receta u Orden' });
+                return;
+            }
+
+            // Generar un ID de Receta u Orden personalizado (ej: R + número aleatorio de 4 dígitos)
+            const prefijo = tipo === 'Receta' ? 'R' : 'O';
+            const idImagen = `${prefijo}${Math.floor(1000 + Math.random() * 9000)}`;
 
             const savedImage = await this.imageDAO.create({
-                idReceta,
+                idImagen,
+                tipo, // <--- Guardamos el tipo
                 filename: req.file.filename,
                 filepath: `/uploads/${req.file.filename}`,
                 mimetype: req.file.mimetype,
@@ -55,6 +64,14 @@ export default class ImageController {
     // Obtener recetas pendientes para el Médico (vínculo por DNI)
     public getPendingImagesForMedico = async (req: Request, res: Response): Promise<void> => {
         try {
+            //Lee el tipo desde la URL (ej: ?tipo=Orden). Si no viene nada, por defecto buscamos 'Receta'
+            const tipoImagen = (req.query.tipo as 'Receta' | 'Orden') || 'Receta';
+
+            if (!['Receta', 'Orden'].includes(tipoImagen)) {
+                res.status(400).json({ message: 'Tipo de imagen no válido' });
+                return;
+            }
+
             // Obtenemos el DNI del médico logueado desde el token
             const medicoDni = (req as any).user?.dni;
 
@@ -74,11 +91,11 @@ export default class ImageController {
             });
 
             // 2. Buscar imágenes con estado 'Pendiente' pertenecientes a estos DNIs
-            const images = await this.imageDAO.findPendingByPacientesDni(pacienteDnis);
+            const images = await this.imageDAO.findPendingByPacientesDni(pacienteDnis, tipoImagen);
 
             // 3. Mapear datos en la estructura requerida por el Front (Mockup)
             const responseData = images.map(img => ({
-                idReceta: img.idReceta,
+                idReceta: img.idImagen,
                 paciente: pacientesMap.get(img.pacienteDni) || 'Paciente no registrado',
                 dniPaciente: img.pacienteDni,
                 fechaCarga: (img as any).createdAt
@@ -113,14 +130,14 @@ export default class ImageController {
     // PATCH /api/images/:idReceta/transcribir
     public transcribeRecipe = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { idReceta } = req.params;
+            const { idImagen } = req.params;
 
-            if (!idReceta || typeof idReceta !== 'string' || !idReceta.trim()) {
+            if (!idImagen || typeof idImagen !== 'string' || !idImagen.trim()) {
                 res.status(400).json({ message: 'El ID de la receta es requerido' });
                 return;
             }
 
-            const updatedImage = await this.imageService.transcribeRecipe(idReceta);
+            const updatedImage = await this.imageService.transcribeRecipe(idImagen);
 
             if (!updatedImage) {
                 res.status(404).json({ message: 'No se encontró la receta solicitada' });

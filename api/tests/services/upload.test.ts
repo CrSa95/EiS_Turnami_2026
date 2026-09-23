@@ -36,7 +36,7 @@ describe("UploadServices", () => {
         expect(result.filename).toBe(mockFile.filename);
         expect(result.filepath).toBe(`/uploads/${mockFile.filename}`);
         expect(result.pacienteDni).toBe(pacienteDni);
-        expect(result.idReceta).toBe(idReceta);
+        expect(result.idImagen).toBe(idReceta);
         expect(ImageModel.prototype.save).toHaveBeenCalledTimes(1);
     });
 });
