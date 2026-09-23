@@ -7,13 +7,13 @@ export default class ImageService {
         this.imageDAO = imageDAO || new ImageDAO();
     }
 
-    public async transcribeRecipe(idReceta: string) {
-        const updatedImage = await this.imageDAO.updateStatus(idReceta, 'Transcripta');
+    public async transcribeImage(idImagen: string) {
+        const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Transcripta');
         return updatedImage;
     }
 
-    public async rejectRecipe(idReceta: string) {
-        const updatedImage = await this.imageDAO.updateStatus(idReceta, 'Rechazada');
+    public async rejectRecipe(idImagen: string) {
+        const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Rechazada');
         return updatedImage;
     }
 }

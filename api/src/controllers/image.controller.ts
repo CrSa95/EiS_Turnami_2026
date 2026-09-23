@@ -131,30 +131,30 @@ export default class ImageController {
         }
     };
 
-    // PATCH /api/images/:idReceta/transcribir
-    public transcribeRecipe = async (req: Request, res: Response): Promise<void> => {
+    // PATCH /api/images/:idImagen/transcribir
+    public transcribeImage = async (req: Request, res: Response): Promise<void> => {
         try {
             const { idImagen } = req.params;
 
             if (!idImagen || typeof idImagen !== 'string' || !idImagen.trim()) {
-                res.status(400).json({ message: 'El ID de la receta es requerido' });
+                res.status(400).json({ message: 'El ID de la receta u orden es requerido' });
                 return;
             }
 
-            const updatedImage = await this.imageService.transcribeRecipe(idImagen);
+            const updatedImage = await this.imageService.transcribeImage(idImagen.trim());
 
             if (!updatedImage) {
-                res.status(404).json({ message: 'No se encontró la receta solicitada' });
+                res.status(404).json({ message: 'No se encontró la receta u orden solicitada' });
                 return;
             }
 
             res.status(200).json({
-                message: 'La receta ha sido marcada como transcripta correctamente',
+                message: 'La receta u orden ha sido marcada como transcripta correctamente',
                 image: updatedImage
             });
         } catch (error) {
             res.status(500).json({
-                message: 'Error al marcar la receta como transcripta',
+                message: 'Error al marcar la receta u orden como transcripta',
                 error
             });
         }
