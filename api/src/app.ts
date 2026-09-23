@@ -148,7 +148,7 @@ app.get(
 app.patch(
   "/api/v1/medico/images/:idImagen/transcribir",
   verificarTokenMedico,
-  imageController.transcribeRecipe,
+  imageController.transcribeImage,
 );
 
 app.patch(
