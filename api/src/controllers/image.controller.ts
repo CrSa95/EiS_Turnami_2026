@@ -161,29 +161,29 @@ export default class ImageController {
     };
   
     // PATCH /api/v1/medico/images/:idReceta/rechazar
-    public rejectRecipe = async (req: Request, res: Response): Promise<void> => {
+    public rejectImage = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { idReceta } = req.params;
+            const { idImagen } = req.params;
 
-            if (!idReceta || typeof idReceta !== 'string' || !idReceta.trim()) {
-                res.status(400).json({ message: 'El ID de la receta es requerido' });
+            if (!idImagen || typeof idImagen !== 'string' || !idImagen.trim()) {
+                res.status(400).json({ message: 'El ID de la receta u orden es requerido' });
                 return;
             }
 
-           const updatedImage = await this.imageService.rejectRecipe(idReceta.trim());
+           const updatedImage = await this.imageService.rejectImage(idImagen.trim());
 
             if (!updatedImage) {
-                res.status(404).json({ message: 'No se encontró la receta solicitada' });
+                res.status(404).json({ message: 'No se encontró la receta u orden solicitada' });
                 return;
             }
 
             res.status(200).json({
-                message: 'La receta ha sido rechazada correctamente',
+                message: 'La receta u orden ha sido rechazada correctamente',
                 image: updatedImage
             });
         } catch (error) {
             res.status(500).json({
-                message: 'Error al rechazar la receta',
+                message: 'Error al rechazar la receta u orden',
                 error
             });
         }

@@ -154,7 +154,7 @@ app.patch(
 app.patch(
   "/api/v1/medico/images/:idImagen/rechazar",
   verificarTokenMedico,
-  imageController.rejectRecipe,
+  imageController.rejectImage,
 );
 
 export default app;

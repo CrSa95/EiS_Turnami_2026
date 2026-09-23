@@ -12,7 +12,7 @@ export default class ImageService {
         return updatedImage;
     }
 
-    public async rejectRecipe(idImagen: string) {
+    public async rejectImage(idImagen: string) {
         const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Rechazada');
         return updatedImage;
     }
