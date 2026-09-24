@@ -21,7 +21,7 @@ function Ordenes({
     <div className="recetas-layout">
       {rol === "paciente" && (
         <div className="recetas">
-          <CargarReceta type={'Orden'} handleUploadImage={handleUploadImage} />
+          <CargarReceta type={"Orden"} handleUploadImage={handleUploadImage} />
         </div>
       )}
       <div className="recetas">
@@ -81,7 +81,7 @@ function Ordenes({
                         type="button"
                         onClick={() => {
                           const id = e.image?.idReceta;
-                          handleTranscribeRecipe(id);
+                          handleTranscribeRecipe(id, "Orden");
                         }}
                       >
                         Marcar como transcripta
@@ -94,7 +94,7 @@ function Ordenes({
                         type="button"
                         onClick={() => {
                           const id = e.image?.idReceta;
-                          handleRejectRecipe(id);
+                          handleRejectRecipe(id, "Orden");
                         }}
                       >
                         Rechazar

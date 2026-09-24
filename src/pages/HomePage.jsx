@@ -58,6 +58,7 @@ function HomePage() {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [rejectRecipeId, setRejectRecipeId] = useState(null);
+  const [rejectDocumentType, setRejectDocumentType] = useState("Receta");
 
   useEffect(() => {
     if (!session) return;
@@ -71,13 +72,23 @@ function HomePage() {
   useEffect(() => {
     if (!session) return;
 
-    const loadImagesRecetas =
+    let loadImages =
       session.role === "patient"
         ? patientImagesRecetas
         : doctorPendingImagesRecetas;
-    loadImagesRecetas(session.access_token, "Receta")
-      .then((images) =>
-        setRecetas(
+
+    const setItems = rejectDocumentType === "Orden" ? setOrdenes : setRecetas;
+
+    if (tab === "ordenes") {
+      loadImages =
+        session.role === "patient"
+          ? patientImagesOrdenes
+          : doctorPendingImagesOrdenes;
+    }
+
+    loadImages(session.access_token, "Receta")
+      .then((images) => {
+        setItems(
           images.map((image) => ({
             paciente: {
               dni: image.dniPaciente,
@@ -92,35 +103,9 @@ function HomePage() {
             },
             image,
           })),
-        ),
-      )
-      .catch(() => setRecetas([]));
-
-    const loadImagesOrdenes =
-      session.role === "patient"
-        ? patientImagesOrdenes
-        : doctorPendingImagesOrdenes;
-
-    loadImagesOrdenes(session.access_token, "Orden")
-      .then((images) =>
-        setOrdenes(
-          images.map((image) => ({
-            paciente: {
-              dni: image.dniPaciente,
-              nombre:
-                image.paciente?.split(" ")[0] || image.paciente || "Paciente",
-              apellido: image.paciente?.split(" ").slice(1).join(" ") || "",
-            },
-            receta: {
-              nombre: image.idReceta,
-              fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
-              estado: image.estado,
-            },
-            image,
-          })),
-        ),
-      )
-      .catch(() => setOrdenes([]));
+        );
+      })
+      .catch(() => setItems([]));
   }, [session]);
 
   if (!session) return <Navigate to="/" replace />;
@@ -200,7 +185,7 @@ function HomePage() {
     }
   };
 
-  const handleTranscribeRecipe = async (idReceta) => {
+  const handleTranscribeRecipe = async (idReceta, type = "Receta") => {
     if (!idReceta) return;
 
     setState(States.Loading);
@@ -208,7 +193,8 @@ function HomePage() {
     try {
       await transcribeRecipe(session.access_token, idReceta);
 
-      setRecetas((prev) =>
+      const setItems = type === "Orden" ? setOrdenes : setRecetas;
+      setItems((prev) =>
         prev.filter((item) => item.image?.idReceta !== idReceta),
       );
 
@@ -225,12 +211,16 @@ function HomePage() {
     }
   };
 
-  const handleOpenRejectModal = (idReceta) => {
-    if (idReceta) setRejectRecipeId(idReceta);
+  const handleOpenRejectModal = (idReceta, type = "Receta") => {
+    if (idReceta) {
+      setRejectRecipeId(idReceta);
+      setRejectDocumentType(type);
+    }
   };
 
   const handleRejectSuccess = (idReceta) => {
-    setRecetas((prev) =>
+    const setItems = rejectDocumentType === "Orden" ? setOrdenes : setRecetas;
+    setItems((prev) =>
       prev.filter((item) => item.image?.idReceta !== idReceta),
     );
 

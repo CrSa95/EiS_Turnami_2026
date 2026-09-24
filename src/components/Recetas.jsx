@@ -22,7 +22,7 @@ function Recetas({
     <div className="recetas-layout">
       {rol === "paciente" && (
         <div className="recetas">
-          <CargarReceta  type={'Receta'} handleUploadImage={handleUploadImage} />
+          <CargarReceta type={"Receta"} handleUploadImage={handleUploadImage} />
         </div>
       )}
       <div className="recetas">
@@ -91,33 +91,31 @@ function Recetas({
                     )}
 
                     {rol !== "paciente" && (
-                       <button
-                         className="receta-action receta-action-primary"
-                         type="button"
-                         onClick={() => {
-                           const id = e.image?.idReceta;
-                           handleTranscribeRecipe(id);
-                         }}
-                       >
-                         Marcar como transcripta
-                       </button>
+                      <button
+                        className="receta-action receta-action-primary"
+                        type="button"
+                        onClick={() => {
+                          const id = e.image?.idReceta;
+                          handleTranscribeRecipe(id, "Receta");
+                        }}
+                      >
+                        Marcar como transcripta
+                      </button>
                     )}
 
                     {rol !== "paciente" && (
-                       <button
-                         className="receta-action receta-action-primary"
-                         type="button"
-                         onClick={() => {
-                           const id = e.image?.idReceta;
-                           handleRejectRecipe(id);
-                         }}
-                       >
-                         Rechazar
-                       </button>
+                      <button
+                        className="receta-action receta-action-primary"
+                        type="button"
+                        onClick={() => {
+                          const id = e.image?.idReceta;
+                          handleRejectRecipe(id, "Receta");
+                        }}
+                      >
+                        Rechazar
+                      </button>
                     )}
-
                   </div>
-
                 </div>
               </article>
             ))
