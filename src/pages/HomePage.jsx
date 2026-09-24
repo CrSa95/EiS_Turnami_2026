@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
-  doctorPendingImages,
-  patientImages,
+  doctorPendingImagesOrdenes,
+  doctorPendingImagesRecetas,
+  patientImagesOrdenes,
+  patientImagesRecetas,
   patientUploadImage,
   rejectRecipe,
   transcribeRecipe,
@@ -37,6 +39,11 @@ const formatRecipeDate = (value) => {
   }).format(date);
 };
 
+const tabs = [
+  { key: "ordenes", label: "Mis Órdenes" },
+  { key: "recetas", label: "Mis Recetas" },
+];
+
 function HomePage() {
   const [session, setSession] = useState(() => {
     const storedSession = localStorage.getItem("turnami-session");
@@ -45,9 +52,10 @@ function HomePage() {
   const navigate = useNavigate();
 
   const [state, setState] = useState("NONE");
+  const [tab, setTab] = useState(tabs[0].key);
   const [recetas, setRecetas] = useState([]);
-
   const [ordenes, setOrdenes] = useState([]);
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [rejectRecipeId, setRejectRecipeId] = useState(null);
 
@@ -63,9 +71,11 @@ function HomePage() {
   useEffect(() => {
     if (!session) return;
 
-    const loadImages =
-      session.role === "patient" ? patientImages : doctorPendingImages;
-    loadImages(session.access_token)
+    const loadImagesRecetas =
+      session.role === "patient"
+        ? patientImagesRecetas
+        : doctorPendingImagesRecetas;
+    loadImagesRecetas(session.access_token)
       .then((images) =>
         setRecetas(
           images.map((image) => ({
@@ -85,6 +95,32 @@ function HomePage() {
         ),
       )
       .catch(() => setRecetas([]));
+
+    const loadImagesOrdenes =
+      session.role === "patient"
+        ? patientImagesOrdenes
+        : doctorPendingImagesOrdenes;
+
+    loadImagesOrdenes(session.access_token)
+      .then((images) =>
+        setOrdenes(
+          images.map((image) => ({
+            paciente: {
+              dni: image.dniPaciente,
+              nombre:
+                image.paciente?.split(" ")[0] || image.paciente || "Paciente",
+              apellido: image.paciente?.split(" ").slice(1).join(" ") || "",
+            },
+            receta: {
+              nombre: image.idReceta,
+              fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
+              estado: image.estado,
+            },
+            image,
+          })),
+        ),
+      )
+      .catch(() => setOrdenes([]));
   }, [session]);
 
   if (!session) return <Navigate to="/" replace />;
@@ -104,7 +140,7 @@ function HomePage() {
     try {
       await patientUploadImage(session.access_token, file);
       setState(States.Ok);
-      const images = await patientImages(session.access_token);
+      const images = await patientImagesRecetas(session.access_token);
       setRecetas(
         images.map((image) => ({
           paciente: { nombre: "", apellido: "" },
@@ -200,12 +236,6 @@ function HomePage() {
     });
   };
 
-  const tabs = [
-    { key: "ordenes", label: "Mis Órdenes" },
-    { key: "recetas", label: "Mis Recetas" },
-  ];
-  const [tab, setTab] = useState(tabs[0].key);
-
   const subtitle =
     role == "paciente"
       ? `Visualiza y envia tus recetas y ordenes`
@@ -234,7 +264,7 @@ function HomePage() {
         )}
         {tab === "ordenes" && (
           <Ordenes
-            ordenes={[]}
+            ordenes={ordenes}
             rol={role}
             handleUploadImage={handleUploadImage}
             handleViewImage={handleViewImage}

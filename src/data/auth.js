@@ -3,10 +3,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 const endpoints = {
   patient: `${API_BASE_URL}/api/v1/paciente/auth`,
   doctor: `${API_BASE_URL}/api/v1/medico/auth`,
-  patientImages: `${API_BASE_URL}/api/v1/paciente/images`,
+  patientImagesRecetas: `${API_BASE_URL}/api/v1/paciente/images`,
   patientUpload: `${API_BASE_URL}/api/v1/paciente/upload`,
-  doctorPendingImages: `${API_BASE_URL}/api/v1/medico/recetas-pendientes`,
-  doctorPatientImages: (pacienteDni) =>
+  doctorPendingImagesRecetas: `${API_BASE_URL}/api/v1/medico/recetas-pendientes`,
+  doctorpatientImagesRecetas: (pacienteDni) =>
     `${API_BASE_URL}/api/v1/medico/paciente/${pacienteDni}/images`,
   transcribeRecipe: (idReceta) =>
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/transcribir`,
@@ -105,31 +105,44 @@ export function patientUploadImage(accessToken, file) {
     body: formData,
   });
 }
- 
-export function patientImages(accessToken) {
-  return requestEndpoint(endpoints.patientImages, {
+
+export function patientImagesRecetas(accessToken) {
+  return requestEndpoint(endpoints.patientImagesRecetas, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
-export function doctorPendingImages(accessToken) {
-  return requestEndpoint(endpoints.doctorPendingImages, {
+export function patientImagesOrdenes(accessToken) {
+  return requestEndpoint(endpoints.patientImagesRecetas, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
+export function doctorPendingImagesRecetas(accessToken) {
+  return requestEndpoint(endpoints.doctorPendingImagesRecetas, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function doctorPendingImagesOrdenes(accessToken) {
+  return requestEndpoint(endpoints.doctorPendingImagesRecetas, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
 export function transcribeRecipe(accessToken, idReceta) {
   return requestEndpoint(endpoints.transcribeRecipe(idReceta), {
     method: "PATCH",
-    headers: { Authorization: `Bearer ${accessToken}`, },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
 export function rejectRecipe(accessToken, idReceta) {
   return requestEndpoint(endpoints.rejectRecipe(idReceta), {
     method: "PATCH",
-    headers: { Authorization: `Bearer ${accessToken}`, },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
