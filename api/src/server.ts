@@ -27,18 +27,37 @@ async function seedMedicoDePrueba() {
 }
 
 async function seedPacienteDePrueba() {
-  const dni = '00000000';
-  const pacienteExistente = await PacienteModel.findOne({ dni }).exec();
+  const pacientes = [
+    {
+      dni: "00000000",
+      nombre: "Maria",
+      apellido: "Gonzalez",
+    },
+    {
+      dni: "12345678",
+      nombre: "Ana",
+      apellido: "Lopez",
+    },
+    {
+      dni: "87654321",
+      nombre: "Carlos",
+      apellido: "Rodriguez",
+    },
+  ];
 
-  if (!pacienteExistente) {
-    await PacienteModel.create({
-      dni,
-      password: await PasswordService.hash('1234'),
-      nombre: 'Maria',
-      apellido: 'Gonzalez',
-      medicoDni: `11223344`
-    });
-    console.log(' Paciente de prueba creado');
+  for (const paciente of pacientes) {
+    const pacienteExistente = await PacienteModel.findOne({
+      dni: paciente.dni,
+    }).exec();
+
+    if (!pacienteExistente) {
+      await PacienteModel.create({
+        ...paciente,
+        password: await PasswordService.hash("1234"),
+        medicoDni: "11223344",
+      });
+      console.log(` Paciente de prueba creado: ${paciente.dni}`);
+    }
   }
 }
 
