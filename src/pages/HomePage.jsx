@@ -206,8 +206,6 @@ function HomePage() {
   ];
   const [tab, setTab] = useState(tabs[0].key);
 
- 
-
   const subtitle =
     role == "paciente"
       ? `Visualiza y envia tus recetas y ordenes`
@@ -221,7 +219,7 @@ function HomePage() {
       />
 
       <div>
-        <TabView tab={tab} tabs={tabs} setTab={(t) => { console.log(t); setTab(t.key)}} />
+        <TabView tab={tab} tabs={tabs} setTab={setTab} />
         {tab == "recetas" && (
           <Recetas
             recetas={recetas}
