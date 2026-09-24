@@ -72,21 +72,18 @@ function HomePage() {
   useEffect(() => {
     if (!session) return;
 
-    let loadImages =
-      session.role === "patient"
+    const isOrdersTab = tab === "ordenes";
+    const loadImages = isOrdersTab
+      ? session.role === "patient"
+        ? patientImagesOrdenes
+        : doctorPendingImagesOrdenes
+      : session.role === "patient"
         ? patientImagesRecetas
         : doctorPendingImagesRecetas;
+    const setItems = isOrdersTab ? setOrdenes : setRecetas;
+    const type = isOrdersTab ? "Orden" : "Receta";
 
-    const setItems = rejectDocumentType === "Orden" ? setOrdenes : setRecetas;
-
-    if (tab === "ordenes") {
-      loadImages =
-        session.role === "patient"
-          ? patientImagesOrdenes
-          : doctorPendingImagesOrdenes;
-    }
-
-    loadImages(session.access_token, "Receta")
+    loadImages(session.access_token, type)
       .then((images) => {
         setItems(
           images.map((image) => ({
@@ -97,7 +94,7 @@ function HomePage() {
               apellido: image.paciente?.split(" ").slice(1).join(" ") || "",
             },
             receta: {
-              nombre: image.idReceta,
+              nombre: image.idReceta || image.idImagen,
               fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
               estado: image.estado,
             },
@@ -106,7 +103,7 @@ function HomePage() {
         );
       })
       .catch(() => setItems([]));
-  }, [session]);
+  }, [session, tab]);
 
   if (!session) return <Navigate to="/" replace />;
 
@@ -129,7 +126,7 @@ function HomePage() {
       const mappedImages = images.map((image) => ({
         paciente: { nombre: "", apellido: "" },
         receta: {
-          nombre: image.idReceta,
+          nombre: image.idReceta || image.idImagen,
           fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
         },
         image,
