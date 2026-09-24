@@ -5,47 +5,46 @@ import RecetaImageModal from "./RecetaImageModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-function Recetas({
+function Ordenes({
   rol,
-  recetas,
+  ordenes,
   handleUploadImage,
   handleViewImage,
-  handleDownload,
   handleTranscribeRecipe,
   handleRejectRecipe,
   selectedImage,
 }) {
   const title =
-    rol == "paciente" ? "Recetas solicitadas" : "Recetas pendientes";
+    rol == "paciente" ? "Ordenes solicitadas" : "Ordenes pendientes";
 
   return (
     <div className="recetas-layout">
       {rol === "paciente" && (
         <div className="recetas">
-          <CargarReceta  type={'Receta'} handleUploadImage={handleUploadImage} />
+          <CargarReceta type={'Orden'} handleUploadImage={handleUploadImage} />
         </div>
       )}
       <div className="recetas">
         <h2 className="recetas-title">{title}</h2>
         <div className="recetas-list">
-          {recetas.length === 0 ? (
+          {ordenes.length == 0 ? (
             <div className="recetas-empty">
               <span className="recetas-empty-icon" aria-hidden="true">
                 ✦
               </span>
               <h3>
                 {rol === "paciente"
-                  ? "Aún no tienes recetas"
+                  ? "Aún no tienes ordenes"
                   : "Todo está al día"}
               </h3>
               <p>
                 {rol === "paciente"
-                  ? "Cuando tengas una receta disponible, aparecerá aquí."
-                  : "No hay recetas pendientes para revisar en este momento."}
+                  ? "Cuando tengas una orden disponible, aparecerá aquí."
+                  : "No hay ordenes pendientes para revisar en este momento."}
               </p>
             </div>
           ) : (
-            recetas.map((e, index) => (
+            ordenes.map((e, index) => (
               <article
                 className="receta-card"
                 key={`${e.paciente.nombre}-${index}`}
@@ -73,51 +72,35 @@ function Recetas({
                       type="button"
                       onClick={() => handleViewImage(e.image)}
                     >
-                      Ver receta
+                      Ver Orden
                     </button>
-                    {false && (
+
+                    {rol !== "paciente" && (
                       <button
-                        className="receta-action receta-action-secondary"
+                        className="receta-action receta-action-primary"
                         type="button"
-                        onClick={() =>
-                          handleDownload(
-                            `${API_BASE_URL}${e.image.filepath}`,
-                            e.image.filename || `${e.receta.nombre}.jpg`,
-                          )
-                        }
+                        onClick={() => {
+                          const id = e.image?.idReceta;
+                          handleTranscribeRecipe(id);
+                        }}
                       >
-                        Descargar imagen
+                        Marcar como transcripta
                       </button>
                     )}
 
                     {rol !== "paciente" && (
-                       <button
-                         className="receta-action receta-action-primary"
-                         type="button"
-                         onClick={() => {
-                           const id = e.image?.idReceta;
-                           handleTranscribeRecipe(id);
-                         }}
-                       >
-                         Marcar como transcripta
-                       </button>
+                      <button
+                        className="receta-action receta-action-primary"
+                        type="button"
+                        onClick={() => {
+                          const id = e.image?.idReceta;
+                          handleRejectRecipe(id);
+                        }}
+                      >
+                        Rechazar
+                      </button>
                     )}
-
-                    {rol !== "paciente" && (
-                       <button
-                         className="receta-action receta-action-primary"
-                         type="button"
-                         onClick={() => {
-                           const id = e.image?.idReceta;
-                           handleRejectRecipe(id);
-                         }}
-                       >
-                         Rechazar
-                       </button>
-                    )}
-
                   </div>
-
                 </div>
               </article>
             ))
@@ -136,4 +119,4 @@ function Recetas({
   );
 }
 
-export default Recetas;
+export default Ordenes;

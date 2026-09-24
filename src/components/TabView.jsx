@@ -1,17 +1,11 @@
 import { useId, useState } from "react";
 import "../styles/tabView.css";
 
-function TabView({ color = "#2563EB", onChange }) {
-  const tabs = [
-    { key: "ordenes", label: "Mis Órdenes" },
-    { key: "recetas", label: "Mis Recetas" },
-  ];
+function TabView({ color = "#2563EB", tabs, tab, setTab }) {
   const tabListId = useId();
-  const [tab, setTab] = useState(tabs[0].key);
 
   const selectTab = (key) => {
     setTab(key);
-    onChange?.(key);
   };
 
   const handleKeyDown = (event, index) => {

@@ -13,6 +13,8 @@ import Recetas from "../components/Recetas";
 import Navigation from "../components/Navigation";
 import ModalState from "../components/ModalStates";
 import ModalReject from "../components/ModalReject";
+import TabView from "../components/TabView";
+import Ordenes from "../components/Ordenes";
 
 export const States = {
   Error: "Error",
@@ -44,6 +46,8 @@ function HomePage() {
 
   const [state, setState] = useState("NONE");
   const [recetas, setRecetas] = useState([]);
+
+  const [ordenes, setOrdenes] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [rejectRecipeId, setRejectRecipeId] = useState(null);
 
@@ -156,53 +160,58 @@ function HomePage() {
     }
   };
 
-     const handleTranscribeRecipe = async (idReceta) => {
-        if (!idReceta) return;
+  const handleTranscribeRecipe = async (idReceta) => {
+    if (!idReceta) return;
 
-        setState(States.Loading);
+    setState(States.Loading);
 
-        try {
-          await transcribeRecipe(session.access_token, idReceta);
-        
-          setRecetas((prev) =>
-            prev.filter(
-              (item) =>
-                item.image?.idReceta !== idReceta
-            )
-          );
-        
-          setState({
-            type: States.Ok,
-            message: "La receta ha sido marcada como transcripta correctamente.",
-          });
-        } catch (error) {
-        
-          setState({
-            type: States.Error,
-            message: "No se pudo marcar la receta como transcripta. Intente nuevamente."
-          });
-        }
-      };
+    try {
+      await transcribeRecipe(session.access_token, idReceta);
 
-      const handleOpenRejectModal = (idReceta) => {
-        if (idReceta) setRejectRecipeId(idReceta);
-      };
+      setRecetas((prev) =>
+        prev.filter((item) => item.image?.idReceta !== idReceta),
+      );
 
-      const handleRejectSuccess = (idReceta) => {
-        setRecetas((prev) =>
-          prev.filter((item) => item.image?.idReceta !== idReceta),
-        );
-      
-        setState({
-          type: States.Ok,
-          message: "La receta ha sido rechazada correctamente.",
-        });
-      };
+      setState({
+        type: States.Ok,
+        message: "La receta ha sido marcada como transcripta correctamente.",
+      });
+    } catch (error) {
+      setState({
+        type: States.Error,
+        message:
+          "No se pudo marcar la receta como transcripta. Intente nuevamente.",
+      });
+    }
+  };
+
+  const handleOpenRejectModal = (idReceta) => {
+    if (idReceta) setRejectRecipeId(idReceta);
+  };
+
+  const handleRejectSuccess = (idReceta) => {
+    setRecetas((prev) =>
+      prev.filter((item) => item.image?.idReceta !== idReceta),
+    );
+
+    setState({
+      type: States.Ok,
+      message: "La receta ha sido rechazada correctamente.",
+    });
+  };
+
+  const tabs = [
+    { key: "ordenes", label: "Mis Órdenes" },
+    { key: "recetas", label: "Mis Recetas" },
+  ];
+  const [tab, setTab] = useState(tabs[0].key);
+
+ 
 
   const subtitle =
     role == "paciente"
-      ? `Visualiza y envia tus recetas`
-      : `Gestiona y transcrive las recetas`;
+      ? `Visualiza y envia tus recetas y ordenes`
+      : `Gestiona y transcrive las recetas y ordenes`;
   return (
     <main className="home-page">
       <Navigation
@@ -210,16 +219,34 @@ function HomePage() {
         subtitle={subtitle}
         handleLogout={handleLogout}
       />
-      <Recetas
-        recetas={recetas}
-        rol={role}
-        handleUploadImage={handleUploadImage}
-        handleViewImage={handleViewImage}
-        handleDownload={handleDownload}
-        handleTranscribeRecipe={handleTranscribeRecipe}
-        handleRejectRecipe={handleOpenRejectModal}
-        selectedImage={selectedImage}
-      />
+
+      <div>
+        <TabView tab={tab} tabs={tabs} setTab={(t) => { console.log(t); setTab(t.key)}} />
+        {tab == "recetas" && (
+          <Recetas
+            recetas={recetas}
+            rol={role}
+            handleUploadImage={handleUploadImage}
+            handleViewImage={handleViewImage}
+            handleDownload={handleDownload}
+            handleTranscribeRecipe={handleTranscribeRecipe}
+            handleRejectRecipe={handleOpenRejectModal}
+            selectedImage={selectedImage}
+          />
+        )}
+        {tab === "ordenes" && (
+          <Ordenes
+            ordenes={[]}
+            rol={role}
+            handleUploadImage={handleUploadImage}
+            handleViewImage={handleViewImage}
+            handleDownload={handleDownload}
+            handleTranscribeRecipe={handleTranscribeRecipe}
+            handleRejectRecipe={handleOpenRejectModal}
+            selectedImage={selectedImage}
+          />
+        )}
+      </div>
 
       <ModalReject
         isOpen={Boolean(rejectRecipeId)}

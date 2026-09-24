@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import "../styles/cargarReceta.css";
 
-function CargarReceta({ handleUploadImage }) {
+function CargarReceta({ handleUploadImage, type }) {
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/png"]);
   const [uploaded, setUploaded] = useState(false);
@@ -60,7 +60,7 @@ function CargarReceta({ handleUploadImage }) {
 
   return (
     <section className="cargar-receta">
-      <h2 className="recetas-title">Cargá tu receta</h2>
+      <h2 className="recetas-title">Cargá tu {type}</h2>
 
       <label className="upload-label" htmlFor="receta-file">
         Sube únicamente una foto de tu documento (formato JPG, JPEG o PNG). No
@@ -119,7 +119,7 @@ function CargarReceta({ handleUploadImage }) {
         type="button"
         onClick={handleSubmit}
       >
-        Enviar Receta
+        Enviar {type}
       </button>
     </section>
   );
