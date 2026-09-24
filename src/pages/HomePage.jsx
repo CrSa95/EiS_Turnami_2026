@@ -75,7 +75,7 @@ function HomePage() {
       session.role === "patient"
         ? patientImagesRecetas
         : doctorPendingImagesRecetas;
-    loadImagesRecetas(session.access_token)
+    loadImagesRecetas(session.access_token, "Receta")
       .then((images) =>
         setRecetas(
           images.map((image) => ({
@@ -101,7 +101,7 @@ function HomePage() {
         ? patientImagesOrdenes
         : doctorPendingImagesOrdenes;
 
-    loadImagesOrdenes(session.access_token)
+    loadImagesOrdenes(session.access_token, "Orden")
       .then((images) =>
         setOrdenes(
           images.map((image) => ({
@@ -135,22 +135,26 @@ function HomePage() {
     navigate("/", { replace: true });
   };
 
-  const handleUploadImage = async (file) => {
+  const handleUploadImage = async (file, type) => {
     setState(States.Loading);
     try {
-      await patientUploadImage(session.access_token, file);
+      await patientUploadImage(session.access_token, file, type);
       setState(States.Ok);
-      const images = await patientImagesRecetas(session.access_token);
-      setRecetas(
-        images.map((image) => ({
-          paciente: { nombre: "", apellido: "" },
-          receta: {
-            nombre: image.idReceta,
-            fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
-          },
-          image,
-        })),
-      );
+      const images = await patientImagesRecetas(session.access_token, type);
+      const mappedImages = images.map((image) => ({
+        paciente: { nombre: "", apellido: "" },
+        receta: {
+          nombre: image.idReceta,
+          fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
+        },
+        image,
+      }));
+
+      if (type === "Orden") {
+        setOrdenes(mappedImages);
+      } else {
+        setRecetas(mappedImages);
+      }
       return true;
     } catch (error) {
       setState(States.Error);

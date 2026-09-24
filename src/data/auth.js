@@ -5,7 +5,7 @@ const endpoints = {
   doctor: `${API_BASE_URL}/api/v1/medico/auth`,
   patientImagesRecetas: `${API_BASE_URL}/api/v1/paciente/images`,
   patientUpload: `${API_BASE_URL}/api/v1/paciente/upload`,
-  doctorPendingImagesRecetas: `${API_BASE_URL}/api/v1/medico/recetas-pendientes`,
+  doctorPendingImages: `${API_BASE_URL}/api/v1/medico/imagenes-pendientes`,
   doctorpatientImagesRecetas: (pacienteDni) =>
     `${API_BASE_URL}/api/v1/medico/paciente/${pacienteDni}/images`,
   transcribeRecipe: (idReceta) =>
@@ -89,7 +89,7 @@ export function validateSession(role, accessToken) {
   });
 }
 
-export function patientUploadImage(accessToken, file) {
+export function patientUploadImage(accessToken, file, type = "Receta") {
   if (!file) {
     return Promise.reject(
       new Error("Seleccioná una imagen antes de enviarla."),
@@ -98,6 +98,7 @@ export function patientUploadImage(accessToken, file) {
 
   const formData = new FormData();
   formData.append("image", file);
+  formData.append("tipo", type);
 
   return requestEndpoint(endpoints.patientUpload, {
     method: "POST",
@@ -106,32 +107,30 @@ export function patientUploadImage(accessToken, file) {
   });
 }
 
-export function patientImagesRecetas(accessToken) {
-  return requestEndpoint(endpoints.patientImagesRecetas, {
+export function patientImagesRecetas(accessToken, type = "Receta") {
+  const url = `${endpoints.patientImagesRecetas}?tipo=${encodeURIComponent(type)}`;
+
+  return requestEndpoint(url, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
 export function patientImagesOrdenes(accessToken) {
-  return requestEndpoint(endpoints.patientImagesRecetas, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  return patientImagesRecetas(accessToken, "Orden");
 }
 
-export function doctorPendingImagesRecetas(accessToken) {
-  return requestEndpoint(endpoints.doctorPendingImagesRecetas, {
+export function doctorPendingImagesRecetas(accessToken, type = "Receta") {
+  const url = `${endpoints.doctorPendingImages}?tipo=${encodeURIComponent(type)}`;
+
+  return requestEndpoint(url, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
 
 export function doctorPendingImagesOrdenes(accessToken) {
-  return requestEndpoint(endpoints.doctorPendingImagesRecetas, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  return doctorPendingImagesRecetas(accessToken, "Orden");
 }
 export function transcribeRecipe(accessToken, idReceta) {
   return requestEndpoint(endpoints.transcribeRecipe(idReceta), {

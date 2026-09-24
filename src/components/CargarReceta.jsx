@@ -50,7 +50,7 @@ function CargarReceta({ handleUploadImage, type }) {
   const handleSubmit = async () => {
     if (!file) return;
 
-    const uploadedSuccessfully = await handleUploadImage(file);
+    const uploadedSuccessfully = await handleUploadImage(file, type);
     if (!uploadedSuccessfully) return;
 
     setFile(null);
