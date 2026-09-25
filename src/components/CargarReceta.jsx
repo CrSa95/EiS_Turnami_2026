@@ -48,7 +48,14 @@ function CargarReceta({ handleUploadImage, type }) {
   };
 
   const handleSubmit = async () => {
-    if (!file) return;
+    if (!file) {
+      // Se setea el error usando el 'type' dinámicamente (receta u orden)
+      setError(`Debe cargar la imagen de la ${type.toLowerCase()} antes de intentar subirla.`);
+      return;
+    }
+
+    // Se limpia el error por si había alguno previo
+    setError("");
 
     const uploadedSuccessfully = await handleUploadImage(file, type);
     if (!uploadedSuccessfully) return;
