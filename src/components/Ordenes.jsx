@@ -66,7 +66,7 @@ function Ordenes({
                   )}
 
                   <div className="receta-actions">
-                    <Badge status={e.status} />
+                    <Badge status={e.receta.estado} />
                     <button
                       className="receta-action receta-action-secondary"
                       type="button"
@@ -80,7 +80,7 @@ function Ordenes({
                         className="receta-action receta-action-primary"
                         type="button"
                         onClick={() => {
-                          const id = e.image?.idReceta;
+                          const id = e.receta.nombre;
                           handleTranscribeRecipe(id, "Orden");
                         }}
                       >
@@ -93,7 +93,7 @@ function Ordenes({
                         className="receta-action receta-action-primary"
                         type="button"
                         onClick={() => {
-                          const id = e.image?.idReceta;
+                          const id = e.receta.nombre;
                           handleRejectRecipe(id, "Orden");
                         }}
                       >

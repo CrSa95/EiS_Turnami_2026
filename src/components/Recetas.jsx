@@ -67,7 +67,7 @@ function Recetas({
                   )}
 
                   <div className="receta-actions">
-                    <Badge status={e.status} />
+                    <Badge status={e.receta.estado} />
                     <button
                       className="receta-action receta-action-secondary"
                       type="button"
@@ -95,7 +95,7 @@ function Recetas({
                         className="receta-action receta-action-primary"
                         type="button"
                         onClick={() => {
-                          const id = e.image?.idReceta;
+                          const id = e.receta.nombre;
                           handleTranscribeRecipe(id, "Receta");
                         }}
                       >
@@ -108,7 +108,7 @@ function Recetas({
                         className="receta-action receta-action-primary"
                         type="button"
                         onClick={() => {
-                          const id = e.image?.idReceta;
+                          const id = e.receta.nombre;
                           handleRejectRecipe(id, "Receta");
                         }}
                       >

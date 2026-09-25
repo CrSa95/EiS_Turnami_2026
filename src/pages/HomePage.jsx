@@ -128,6 +128,7 @@ function HomePage() {
         receta: {
           nombre: image.idReceta || image.idImagen,
           fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
+          estado: image.estado, 
         },
         image,
       }));
@@ -192,7 +193,7 @@ function HomePage() {
 
       const setItems = type === "Orden" ? setOrdenes : setRecetas;
       setItems((prev) =>
-        prev.filter((item) => item.image?.idReceta !== idReceta),
+        prev.filter((item) => item.receta.nombre !== idReceta),
       );
 
       setState({
@@ -218,7 +219,7 @@ function HomePage() {
   const handleRejectSuccess = (idReceta) => {
     const setItems = rejectDocumentType === "Orden" ? setOrdenes : setRecetas;
     setItems((prev) =>
-      prev.filter((item) => item.image?.idReceta !== idReceta),
+      prev.filter((item) => item.receta.nombre !== idReceta),
     );
 
     setState({
@@ -230,7 +231,7 @@ function HomePage() {
   const subtitle =
     role == "paciente"
       ? `Visualiza y envia tus recetas y ordenes`
-      : `Gestiona y transcrive las recetas y ordenes`;
+      : `Gestiona y transcribe las recetas y ordenes`;
   return (
     <main className="home-page">
       <Navigation
