@@ -6,6 +6,7 @@ import PasswordService from './services/password.services.js';
 dotenv.config();
 
 import app from './app.js';
+import imageModel from './model/image.model.js';
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "http://localhost"
@@ -64,7 +65,14 @@ async function seedPacienteDePrueba() {
 async function bootstrap() {
   try {
     await mongoose.connect(MONGO_URI);
-    console.log(' Conectado a MongoDB');
+    console.log(" Conectado a MongoDB");
+    try {
+      await imageModel.collection.dropIndex("idReceta_1");
+    } catch (error) {
+      if ((error as { codeName?: string }).codeName !== "IndexNotFound") {
+        throw error;
+      }
+    }
     await seedMedicoDePrueba();
     await seedPacienteDePrueba();
 
