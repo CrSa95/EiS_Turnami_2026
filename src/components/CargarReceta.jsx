@@ -3,7 +3,7 @@ import "../styles/cargarReceta.css";
 
 function CargarReceta({ handleUploadImage, type }) {
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
-  const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/png"]);
+  const ALLOWED_FILE_TYPES = new Set(["image/jpeg"]);
   const [uploaded, setUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState(null);
@@ -17,13 +17,13 @@ function CargarReceta({ handleUploadImage, type }) {
     if (!file) return;
 
     const fileExtension = file.name.split(".").pop()?.toLowerCase();
-    const allowedExtensions = ["jpg", "jpeg", "png"];
+    const allowedExtensions = ["jpg", "jpeg"];
 
     if (
       !allowedExtensions.includes(fileExtension) ||
       !ALLOWED_FILE_TYPES.has(file.type)
     ) {
-      setError("El archivo debe ser una imagen JPG, JPEG o PNG.");
+      setError("El archivo debe ser una imagen JPG o JPEG.");
       setFile(null);
       setUploaded(false);
       event.target.value = "";
@@ -63,7 +63,7 @@ function CargarReceta({ handleUploadImage, type }) {
       <h2 className="recetas-title">Cargá tu {type}</h2>
 
       <label className="upload-label" htmlFor="receta-file">
-        Sube únicamente una foto de tu documento (formato JPG, JPEG o PNG). No
+        Sube únicamente una foto de tu documento (formato JPG o JPEG). No
         se aceptan archivos PDF ni documentos de texto.
       </label>
       {error && <p className="upload-error">{error}</p>}
@@ -73,7 +73,7 @@ function CargarReceta({ handleUploadImage, type }) {
         className="upload-input"
         type="file"
         onChange={handleFileChange}
-        accept=".jpg, .jpeg, .png"
+        accept=".jpg, .jpeg"
       />
       <div
         className={`upload-zone ${uploaded ? "is-uploaded" : ""}`}
@@ -108,7 +108,7 @@ function CargarReceta({ handleUploadImage, type }) {
             <p className="upload-message upload-message-dark">
               Hacé clic para subir imagen
             </p>
-            <p className="upload-file-name">JPG, PNG — máx. 5MB</p>
+            <p className="upload-file-name">JPGE, JPG — máx. 5MB</p>
           </div>
         )}
       </div>
