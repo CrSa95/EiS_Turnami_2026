@@ -140,7 +140,10 @@ function HomePage() {
       }
       return true;
     } catch (error) {
-      setState(States.Error);
+      setState({
+        type: States.Error,
+        message: `No se pudo enviar la solicitud de ${type.toLowerCase()}. Intente nuevamente.`,
+      });
       return false;
     }
   };
