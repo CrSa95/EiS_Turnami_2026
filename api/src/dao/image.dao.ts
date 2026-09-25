@@ -25,7 +25,7 @@ export default class ImageDAO {
             pacienteDni: { $in: pacienteDnis },
             estado: 'Pendiente',
             tipo: tipoDocumento // Filtro de recetas u ordenes
-        }).sort({ createdAt: -1 });
+        }).sort({ createdAt: 1 });
     }
 
     async updateStatus(idImagen: string, nuevoEstado: string): Promise<IImage | null> {
