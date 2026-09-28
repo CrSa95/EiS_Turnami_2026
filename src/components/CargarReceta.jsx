@@ -2,8 +2,9 @@ import { useRef, useState } from "react";
 import "../styles/cargarReceta.css";
 
 function CargarReceta({ handleUploadImage, type }) {
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
-  const ALLOWED_FILE_TYPES = new Set(["image/jpeg"]);
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+  const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/jpg"]);
+  
   const [uploaded, setUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState(null);
@@ -20,10 +21,11 @@ function CargarReceta({ handleUploadImage, type }) {
     const allowedExtensions = ["jpg", "jpeg"];
 
     if (
+      !fileExtension ||
       !allowedExtensions.includes(fileExtension) ||
       !ALLOWED_FILE_TYPES.has(file.type)
     ) {
-      setError("El archivo debe ser una imagen JPG o JPEG.");
+      setError("Formato de imagen ilegible, por favor suba una imagen en formato jpg");
       setFile(null);
       setUploaded(false);
       event.target.value = "";
@@ -49,12 +51,10 @@ function CargarReceta({ handleUploadImage, type }) {
 
   const handleSubmit = async () => {
     if (!file) {
-      // Se setea el error usando el 'type' dinámicamente (receta u orden)
       setError(`Debe cargar la imagen de la ${type.toLowerCase()} antes de intentar subirla.`);
       return;
     }
 
-    // Se limpia el error por si había alguno previo
     setError("");
 
     const uploadedSuccessfully = await handleUploadImage(file, type);
@@ -71,17 +71,19 @@ function CargarReceta({ handleUploadImage, type }) {
 
       <label className="upload-label" htmlFor="receta-file">
         Sube únicamente una foto de tu documento (formato JPG o JPEG). No
-        se aceptan archivos PDF ni documentos de texto.
+        se aceptan archivos PNG, PDF ni documentos de texto.
       </label>
       {error && <p className="upload-error">{error}</p>}
+    
       <input
         ref={fileInputRef}
         id="receta-file"
         className="upload-input"
         type="file"
         onChange={handleFileChange}
-        accept=".jpg, .jpeg"
+        accept=".jpg, .jpeg, .png, image/jpeg, image/png"
       />
+
       <div
         className={`upload-zone ${uploaded ? "is-uploaded" : ""}`}
         onClick={handleUpload}
@@ -115,7 +117,7 @@ function CargarReceta({ handleUploadImage, type }) {
             <p className="upload-message upload-message-dark">
               Hacé clic para subir imagen
             </p>
-            <p className="upload-file-name">JPGE, JPG — máx. 5MB</p>
+            <p className="upload-file-name">JPEG, JPG — máx. 5MB</p>
           </div>
         )}
       </div>
