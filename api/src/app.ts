@@ -14,12 +14,21 @@ import PacienteDAO from './dao/paciente.dao.js';
 import ImageService from './services/image.service.js';
 import ImageController from './controllers/image.controller.js';
 
+import TurnoDAO from './dao/turno.dao.js';
+import TurnoService from './services/turno.service.js';
+import TurnoController from './controllers/turno.controller.js';
+
+
 const app: Application = express();
 // Instanciamos el DAO y el Controlador de imágenes
 const imageDAO = new ImageDAO();
 const pacienteDAO = new PacienteDAO(); // Inyectamos el DAO de Paciente
 const imageService = new ImageService(imageDAO);
 const imageController = new ImageController(imageDAO, pacienteDAO, imageService);
+
+const turnoDAO = new TurnoDAO();
+const turnoService = new TurnoService(turnoDAO);
+const turnoController = new TurnoController(turnoService);
 
 app.use(cors());
 app.use(express.json());
@@ -155,6 +164,19 @@ app.patch(
   "/api/v1/medico/images/:idImagen/rechazar",
   verificarTokenMedico,
   imageController.rejectImage,
+);
+
+// --- RUTAS DE TURNOS ---
+app.post(
+  "/api/v1/paciente/turnos",
+  verificarTokenPaciente,
+  turnoController.solicitarTurno
+);
+
+app.get(
+  "/api/v1/paciente/turnos/estado",
+  verificarTokenPaciente,
+  turnoController.obtenerEstadoSemanal
 );
 
 export default app;
