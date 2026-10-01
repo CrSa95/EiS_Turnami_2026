@@ -20,7 +20,7 @@ export class TurnoService {
 
   async solicitarTurno(datos: {
     pacienteDni: string;
-    medicoDni?: string; // <-- Ahora es opcional
+    medicoDni?: string;
     motivo?: string;
     descripcion?: string;
     fechaPreferencia: string;
@@ -28,7 +28,6 @@ export class TurnoService {
   }) {
     let medicoDniFinal = datos.medicoDni;
 
-    // Si el frontend no envió el medicoDni, lo buscamos directamente en la BD
     if (!medicoDniFinal || medicoDniFinal.trim() === "") {
       const paciente = await Paciente.findOne({ dni: datos.pacienteDni });
 
