@@ -12,6 +12,8 @@ const endpoints = {
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/transcribir`,
   rejectRecipe: (idReceta) =>
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/rechazar`,
+  patientTurnos: `${API_BASE_URL}/api/v1/paciente/turnos`,
+  patientEstadoTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/estado`,
 };
 
 const TEST_SESSION = {
@@ -145,3 +147,24 @@ export function rejectRecipe(accessToken, idReceta) {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 }
+
+
+export const obtenerEstadoTurnos = async (accessToken) => {
+  return requestEndpoint(endpoints.patientEstadoTurnos, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+};
+
+export const solicitarTurno = async (accessToken, payload) => {
+  return requestEndpoint(endpoints.patientTurnos, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(payload)
+  });
+};
