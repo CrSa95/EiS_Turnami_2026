@@ -9,25 +9,26 @@ export class TurnoController {
   }
 
   solicitarTurno = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const pacienteDni = (req as any).user?.dni;
-      const { medicoDni, motivo, descripcion, fechaPreferencia, horaPreferencia } = req.body;
+  try {
+    const pacienteDni = (req as any).user?.dni;
+    const { medicoDni, motivo, descripcion, fechaPreferencia, horaPreferencia } = req.body;
 
-      const resultado = await this.turnoService.solicitarTurno({
-        pacienteDni,
-        medicoDni,
-        motivo,
-        descripcion,
-        fechaPreferencia,
-        horaPreferencia
-      });
+    const { mensaje, turno } = await this.turnoService.solicitarTurno({
+      pacienteDni,
+      medicoDni,     
+      motivo,
+      descripcion,
+      fechaPreferencia,
+      horaPreferencia
+    });
 
-      res.status(201).json(resultado);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Error al solicitar turno";
-      res.status(400).json({ message });
-    }
+    res.status(201).json({ mensaje, turno });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Error al solicitar turno";
+    res.status(400).json({ message });
+  }
   };
+
 
   obtenerEstadoSemanal = async (req: Request, res: Response): Promise<void> => {
     try {

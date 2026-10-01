@@ -10,7 +10,7 @@ export enum EstadoTurno {
 export interface ITurno extends Document {
   pacienteDni: string;
   medicoDni: string;
-  medicoNombre?: string;
+  medicoNombre: string;
   motivo: string;
   descripcion?: string;
   fechaPreferencia: Date;

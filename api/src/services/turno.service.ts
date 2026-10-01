@@ -1,6 +1,7 @@
 import TurnoDAO from '../dao/turno.dao.js';
 import { EstadoTurno } from '../model/turno.model.js';
-import Paciente from '../model/paciente.model.js'; // <-- Importa el modelo de Paciente
+import Paciente from '../model/paciente.model.js';
+import Medico from '../model/medico.model.js';
 
 export class TurnoService {
   private turnoDAO: TurnoDAO;
@@ -9,6 +10,7 @@ export class TurnoService {
     this.turnoDAO = turnoDAO;
   }
 
+  
   private getSemanaAnio(fecha: Date): string {
     const d = new Date(fecha);
     d.setHours(0, 0, 0, 0);
@@ -27,15 +29,22 @@ export class TurnoService {
     horaPreferencia: string;
   }) {
     let medicoDniFinal = datos.medicoDni;
+    let medicoN;
+    let medicoP;
+    let medicoNombre;
 
     if (!medicoDniFinal || medicoDniFinal.trim() === "") {
       const paciente = await Paciente.findOne({ dni: datos.pacienteDni });
+      const medico = await Medico.findOne({ dni: paciente?.medicoDni });
 
       if (!paciente || !paciente.medicoDni) {
         throw new Error("No se pudo determinar el médico asignado al paciente.");
       }
 
       medicoDniFinal = paciente.medicoDni;
+      medicoN = medico ? medico.nombre : "";
+      medicoP = medico ? medico.apellido : "";
+      medicoNombre = medicoN && medicoP ? `${medicoN} ${medicoP}` : "";
     }
 
     const fecha = new Date(datos.fechaPreferencia);
@@ -52,7 +61,8 @@ export class TurnoService {
 
     const nuevoTurno = await this.turnoDAO.crearTurno({
       pacienteDni: datos.pacienteDni,
-      medicoDni: medicoDniFinal, // <-- Usamos el valor validado/resuelto
+      medicoDni: medicoDniFinal,
+      medicoNombre: medicoNombre,
       motivo: motivoFinal,
       descripcion: datos.descripcion || "",
       fechaPreferencia: fecha,
