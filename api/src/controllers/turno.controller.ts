@@ -11,12 +11,11 @@ export class TurnoController {
   solicitarTurno = async (req: Request, res: Response): Promise<void> => {
     try {
       const pacienteDni = (req as any).user?.dni;
-      const { medicoDni, medicoNombre, motivo, descripcion, fechaPreferencia, horaPreferencia } = req.body;
+      const { medicoDni, motivo, descripcion, fechaPreferencia, horaPreferencia } = req.body;
 
       const resultado = await this.turnoService.solicitarTurno({
         pacienteDni,
         medicoDni,
-        medicoNombre,
         motivo,
         descripcion,
         fechaPreferencia,

@@ -58,7 +58,6 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       req.user = { dni: "12345678" };
       req.body = {
         medicoDni: "87654321",
-        medicoNombre: "Dr. House",
         fechaPreferencia: "2026-10-20T11:00:00Z",
         horaPreferencia: "11:00",
         motivo: "Chequeo general",
@@ -81,7 +80,6 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       expect(mockTurnoService.solicitarTurno).toHaveBeenCalledWith({
         pacienteDni: "12345678",
         medicoDni: "87654321",
-        medicoNombre: "Dr. House",
         fechaPreferencia: "2026-10-20T11:00:00Z",
         horaPreferencia: "11:00",
         motivo: "Chequeo general",
