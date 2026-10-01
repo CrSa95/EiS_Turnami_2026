@@ -17,6 +17,7 @@ import ModalState from "../components/ModalStates";
 import ModalReject from "../components/ModalReject";
 import TabView from "../components/TabView";
 import Ordenes from "../components/Ordenes";
+import Turno from "../components/Turno";
 
 export const States = {
   Error: "Error",
@@ -42,6 +43,7 @@ const formatRecipeDate = (value) => {
 const tabs = [
   { key: "ordenes", label: "Mis Órdenes" },
   { key: "recetas", label: "Mis Recetas" },
+  { key: "turnos", label: "Mis Turnos" },
 ];
 
 function HomePage() {
@@ -230,6 +232,12 @@ function HomePage() {
       message: "La receta ha sido rechazada correctamente.",
     });
   };
+  
+  const onCancelTurno = () => {
+    setTab(tabs[0].key);
+  }
+
+
 
   const subtitle =
     role == "paciente"
@@ -269,6 +277,14 @@ function HomePage() {
             selectedImage={selectedImage}
           />
         )}
+        {tab === "turnos" && (
+          <Turno
+            role={role}
+            token={session.access_token}
+            dni={session.user?.dni || session.dni}
+            onCancel={onCancelTurno}
+          />
+        ) }  
       </div>
 
       <ModalReject
