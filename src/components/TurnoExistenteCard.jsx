@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
+import { cancelarTurno } from "../data/auth.js";
 
 function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
   const [cargando, setCargando] = useState(false);
@@ -11,18 +12,40 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
   });
 
   const medicoNombre = turno.medicoNombre || "Médico de cabecera";
-  const fecha = turno.fechaPreferencia || turno.fecha;
+  const fechaRaw = turno.fechaPreferencia || turno.fecha;
   const hora = turno.horaPreferencia || turno.hora;
 
-  /**
-   * Helper para verificar si la fecha del turno está a más de 24 hs de la fecha actual
-   */
-  const esCancelable24hs = () => {
-    if (!fecha || !hora) return true; // Si no hay datos, dejamos intentar o manejamos con fallback
+  const formatearFechaTexto = (fechaStr) => {
+    if (!fechaStr) return "";
 
-    // Creamos un objeto Date combinando fecha (YYYY-MM-DD) y hora (HH:mm)
-    const fechaHoraTurno = new Date(`${fecha}T${hora}:00`);
+    const soloFecha = fechaStr.includes("T") ? fechaStr.split("T")[0] : fechaStr;
+    const [anio, mes, dia] = soloFecha.split("-");
+
+    if (!anio || !mes || !dia) return fechaStr;
+
+    const fechaObj = new Date(Number(anio), Number(mes) - 1, Number(dia));
+
+    return fechaObj.toLocaleDateString("es-AR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const fechaFormateada = formatearFechaTexto(fechaRaw);
+
+  const esCancelable24hs = () => {
+    if (typeof turno.cancelable === "boolean") {
+      return turno.cancelable;
+    }
+
+    if (!fechaRaw || !hora) return true;
+
+    const fechaLimpia = fechaRaw.includes("T") ? fechaRaw.split("T")[0] : fechaRaw;
+    const fechaHoraTurno = new Date(`${fechaLimpia}T${hora}:00`);
     const ahora = new Date();
+
+    if (isNaN(fechaHoraTurno.getTime())) return true;
 
     const diferenciaMs = fechaHoraTurno.getTime() - ahora.getTime();
     const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
@@ -44,7 +67,7 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
     setModalState({
       visible: true,
       type: "confirmacion",
-      message: `¿Está seguro de que desea cancelar el turno con Dr/a ${medicoNombre} para el ${fecha} a las ${hora} hs?`,
+      message: `¿Está seguro de que desea cancelar el turno con Dr/a ${medicoNombre} para el ${fechaFormateada} a las ${hora} hs?`,
     });
   };
 
@@ -57,6 +80,14 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
     });
 
     try {
+      const idTurno = turno.id || turno._id || turno.idTurno;
+
+      if (!idTurno) {
+        throw new Error("No se pudo obtener el identificador del turno.");
+      }
+
+      await cancelarTurno(token, idTurno);
+
       setModalState({
         visible: true,
         type: "exito",
@@ -67,6 +98,7 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
         visible: true,
         type: "error",
         message:
+          error.message ||
           "Ocurrió un error al intentar cancelar el turno. Por favor, intente nuevamente.",
       });
     } finally {
@@ -87,7 +119,7 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
     <div className="turno-status-card">
       <h2>Mis Turnos</h2>
       <p className="mensaje-confirmacion">
-        {`Se solicitó un turno con Dr/a ${medicoNombre} para el día ${fecha} a las ${hora} hs.`}
+        {`Se solicitó un turno con Dr/a ${medicoNombre} para el día ${fechaFormateada} a las ${hora} hs.`}
       </p>
 
       <div className="acciones" style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
@@ -95,11 +127,12 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
           type="button"
           onClick={handleBotonCancelarClick}
           className="btn-danger"
+          disabled={cargando}
           style={{ backgroundColor: "#dc3545", color: "#fff" }}
         >
           Cancelar turno
         </button>
-        <button type="button" onClick={onVolver} className="btn-secondary">
+        <button type="button" onClick={onVolver} className="btn-secondary" disabled={cargando}>
           Volver al inicio
         </button>
       </div>
@@ -117,6 +150,7 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
                 type="button"
                 onClick={ejecutarCancelacion}
                 className="btn-primary"
+                disabled={cargando}
                 style={{ backgroundColor: "#dc3545", borderColor: "#dc3545" }}
               >
                 Sí, cancelar
@@ -125,8 +159,9 @@ function TurnoExistenteCard({ turno, token, onTurnoCancelado, onVolver }) {
                 type="button"
                 onClick={handleCloseModal}
                 className="btn-secondary"
+                disabled={cargando}
               >
-                Volver/Mantener turno
+                Mantener turno
               </button>
             </div>
           </section>

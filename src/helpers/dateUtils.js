@@ -1,9 +1,3 @@
-/**
- * Formatea un objeto Date a string YYYY-MM-DD usando la zona horaria local.
- */
-/**
- * Formatea un objeto Date a string YYYY-MM-DD usando la zona horaria local.
- */
 const formatFechaLocal = (fecha) => {
   const year = fecha.getFullYear();
   const month = String(fecha.getMonth() + 1).padStart(2, "0");
@@ -11,11 +5,6 @@ const formatFechaLocal = (fecha) => {
   return `${year}-${month}-${day}`;
 };
 
-/**
- * Calcula el rango de fechas válidas:
- * - Jueves post-19hs, Viernes post-19hs, Sábado o Domingo -> Próxima semana (Lunes a Viernes)
- * - Lunes a Jueves antes de las 19hs -> Desde Mañana hasta el Viernes de la semana actual
- */
 export const getRangoFechasSemanaActual = () => {
   const hoy = new Date();
   const diaSemana = hoy.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mié, 4: Jue, 5: Vie, 6: Sáb
@@ -74,7 +63,6 @@ export const generarHorarios = (fechaSeleccionada) => {
   const minutosActuales = hoy.getMinutes();
 
   while (hora < 19 || (hora === 19 && minutos === 0)) {
-    // Si la fecha elegida es HOY, descardamos los horarios pasados
     const yaPaso = esHoy && (hora < horaActual || (hora === horaActual && minutos <= minutosActuales));
 
     if (!yaPaso) {
