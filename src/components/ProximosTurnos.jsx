@@ -1,32 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
-import { format, parseISO, isValid } from "date-fns";
-import { es } from "date-fns/locale";
-import { obtenerEstadoTurnos } from "../data/auth";
+import { obtenerProximosTurnos } from "../data/auth";
+import {
+  formatearFechaTexto,
+  getFechaHoraTurno,
+  getTurnoId,
+} from "../helpers/dateUtils";
 
 const ESPECIALIDAD = "Clínica médica";
 
-const formatearFecha = (fecha) => {
-  if (!fecha || typeof fecha !== "string") {
-    return "Fecha no disponible";
-  }
-
-  const fechaLocal = fecha.includes("T") ? fecha.split("T")[0] : fecha;
-  const fechaParseada = parseISO(fechaLocal);
-
-  if (!isValid(fechaParseada)) {
-    return "Fecha no disponible";
-  }
-
-  return format(fechaParseada, "d 'de' MMMM 'de' yyyy", {
-    locale: es,
-  });
-};
 
 const formatearHora = (hora) => {
   if (!hora || typeof hora !== "string") {
     return "Hora no disponible";
   }
-  // Garantizar el formato HH:mm agregando padStart si viene como "9:00"
+
   const partes = hora.trim().split(":");
   if (partes.length >= 2) {
     const hh = partes[0].padStart(2, "0");
@@ -34,21 +21,6 @@ const formatearHora = (hora) => {
     return `${hh}:${mm} hs`;
   }
   return hora.slice(0, 5);
-};
-
-const obtenerFechaHora = (turno) => {
-  const fecha = turno?.fechaPreferencia || turno?.fecha;
-  const hora = turno?.horaPreferencia || turno?.hora;
-
-  if (!fecha || !hora) {
-    return null;
-  }
-
-  const fechaLimpia = fecha.includes("T") ? fecha.split("T")[0] : fecha;
-  const horaLimpia = hora.length === 5 ? hora : hora.padStart(5, "0");
-  const fechaHora = parseISO(`${fechaLimpia}T${horaLimpia}`);
-
-  return isValid(fechaHora) ? fechaHora : null;
 };
 
 const obtenerNombreMedico = (turno) => {
@@ -70,16 +42,13 @@ export default function ProximosTurnos({ token }) {
     setError(false);
 
     try {
-      const respuesta = await obtenerEstadoTurnos(token);
+      const respuesta = await obtenerProximosTurnos(token);
 
-      // Normalizar la respuesta de la API (sea array directo u objeto con propiedad turnos/turno)
       let lista = [];
       if (Array.isArray(respuesta)) {
         lista = respuesta;
-      } else if (respuesta?.turnos && Array.isArray(respuesta.turnos)) {
+      } else if (Array.isArray(respuesta?.turnos)) {
         lista = respuesta.turnos;
-      } else if (respuesta?.turno || respuesta?.id || respuesta?._id) {
-        lista = [respuesta.turno || respuesta];
       }
 
       const ahora = new Date();
@@ -87,18 +56,19 @@ export default function ProximosTurnos({ token }) {
       const proximosTurnos = lista
         .filter((turno) => {
           if (!turno) return false;
-          const fechaHora = obtenerFechaHora(turno);
-          const estadoValido =
-              !turno.estado ||
-              turno.estado.toUpperCase() === "CONFIRMADO"
 
+          // Solo turnos confirmados
+          const estado = String(turno.estado ?? "").trim().toLowerCase();
+          if (estado !== "confirmado") return false;
 
-          return estadoValido && fechaHora && fechaHora > ahora;
+          const fechaHora = getFechaHoraTurno(turno);
+          return fechaHora ? fechaHora > ahora : true;
         })
         .sort((a, b) => {
-          const fA = obtenerFechaHora(a);
-          const fB = obtenerFechaHora(b);
-          return (fA ? fA.getTime() : 0) - (fB ? fB.getTime() : 0);
+          const fA = getFechaHoraTurno(a);
+          const fB = getFechaHoraTurno(b);
+          if (!fA || !fB) return 0;
+          return fA.getTime() - fB.getTime();
         });
 
       setTurnos(proximosTurnos);
@@ -108,7 +78,7 @@ export default function ProximosTurnos({ token }) {
     } finally {
       setCargando(false);
     }
-  }, [token]); // Se añade token a las dependencias
+  }, [token]);
 
   useEffect(() => {
     cargarTurnos();
@@ -149,7 +119,9 @@ export default function ProximosTurnos({ token }) {
       ) : (
         <ul className="turnos-lista">
           {turnos.map((turno) => {
-            const idKey = turno.id || turno._id || `${turno.fecha}-${turno.hora}`;
+            const idKey =
+              getTurnoId(turno) ??
+              `${turno.fecha || turno.fechaPreferencia}-${turno.hora || turno.horaPreferencia}`;
             return (
               <li className="turno-tarjeta" key={idKey}>
                 <h2>{obtenerNombreMedico(turno)}</h2>
@@ -158,15 +130,11 @@ export default function ProximosTurnos({ token }) {
                 </p>
                 <p>
                   <strong>Fecha:</strong>{" "}
-                  {formatearFecha(
-                    turno.fechaPreferencia || turno.fecha
-                  )}
+                  {formatearFechaTexto(turno.fechaPreferencia || turno.fecha)}
                 </p>
                 <p>
                   <strong>Hora:</strong>{" "}
-                  {formatearHora(
-                    turno.horaPreferencia || turno.hora
-                  )}
+                  {formatearHora(turno.horaPreferencia || turno.hora)}
                 </p>
               </li>
             );

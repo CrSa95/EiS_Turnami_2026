@@ -1,4 +1,3 @@
-
 import {
   addDays,
   format,
@@ -151,6 +150,22 @@ export const formatearFechaTexto = (fechaStr) => {
 };
 
 /**
+ * Devuelve el Date (hora local) en que ocurre el turno, o null si no se puede armar.
+ */
+export const getFechaHoraTurno = (turno) => {
+  const fechaRaw = turno?.fechaPreferencia || turno?.fecha;
+  const hora = turno?.horaPreferencia || turno?.hora;
+
+  if (!fechaRaw || !hora) return null;
+
+  const fechaLimpia = fechaRaw.includes("T") ? fechaRaw.split("T")[0] : fechaRaw;
+  const horaLimpia = hora.trim().padStart(5, "0");
+  const fechaHora = parseISO(`${fechaLimpia}T${horaLimpia}:00`);
+
+  return isValid(fechaHora) ? fechaHora : null;
+};
+
+/**
  * Comprueba si un turno puede cancelarse por el plazo de 24 horas.
  *
  * Si la API proporciona turno.cancelable como booleano,
@@ -161,29 +176,45 @@ export const esCancelable24hs = (turno) => {
     return turno.cancelable;
   }
 
-  const fechaRaw = turno?.fechaPreferencia || turno?.fecha;
-  const hora = turno?.horaPreferencia || turno?.hora;
+  const fechaHoraTurno = getFechaHoraTurno(turno);
+  if (!fechaHoraTurno) return false;
 
-  if (!fechaRaw || !hora) {
-    return false;
-  }
-
-  const fechaLimpia = fechaRaw.includes("T")
-    ? fechaRaw.split("T")[0]
-    : fechaRaw;
-
-  const fechaHoraTurno = parseISO(
-    `${fechaLimpia}T${hora}:00`
-  );
-
-  if (!isValid(fechaHoraTurno)) {
-    return false;
-  }
-
-  const diferencia = differenceInMilliseconds(
-    fechaHoraTurno,
-    new Date()
-  );
-
-  return diferencia >= 24 * 60 * 60 * 1000;
+  return differenceInMilliseconds(fechaHoraTurno, new Date()) >= 24 * 60 * 60 * 1000;
 };
+
+/**
+ * Calcula la semana ISO del año en formato YYYY-<númeroSemana>.
+ * Coincide con la lógica usada en el backend.
+ *
+ * Acepta un Date o un string (YYYY-MM-DD / ISO). Los strings se
+ * interpretan por su componente de fecha en horario local, para evitar
+ * que "2026-10-05" (UTC) caiga en el día anterior en Argentina.
+ */
+export const getSemanaAnio = (fecha) => {
+  const base = typeof fecha === "string" ? parseFecha(fecha) : fecha;
+
+  if (!base || Number.isNaN(new Date(base).getTime())) {
+    return null;
+  }
+
+  const d = new Date(base);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const weekNo = Math.ceil(((Math.round((d - yearStart) / 86400000)) + 1) / 7);
+  return `${d.getFullYear()}-${weekNo}`;
+};
+
+/**
+ * Obtiene el identificador de un turno sin importar cómo lo serialice la API.
+ */
+export const getTurnoId = (turno) =>
+  turno?.id ?? turno?._id ?? turno?.idTurno ?? null;
+
+/**
+ * Indica si el turno sigue activo (pendiente o confirmado).
+ */
+export const esTurnoActivo = (turno) =>
+  Boolean(turno) &&
+  (!turno.estado ||
+    ["PENDIENTE", "CONFIRMADO"].includes(String(turno.estado).toUpperCase()));
