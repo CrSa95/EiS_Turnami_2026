@@ -5,6 +5,7 @@ import {
   getFechaHoraTurno,
   getTurnoId,
 } from "../helpers/dateUtils";
+import "../styles/ProximosTurnos.css";
 
 const ESPECIALIDAD = "Clínica médica";
 
