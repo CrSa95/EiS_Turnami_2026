@@ -13,8 +13,17 @@ function TurnoPaciente({ token, dni, onCancel }) {
   const [turnoExistente, setTurnoExistente] = useState(null);
 
   const { min: fechaMin, max: fechaMax } = useMemo(() => getRangoFechasSemanaActual(), []);
-  const opcionesHorarias = useMemo(() => generarHorarios(), []);
   const [medicoNombre, setMedicoNombre] = useState("Médico de cabecera");
+  
+  useEffect(() => {
+    if (fechaMin && !fechaPreferencia) {
+      setFechaPreferencia(fechaMin);
+    }
+  }, [fechaMin]);
+
+  const opcionesHorarias = useMemo(() => {
+    return generarHorarios(fechaPreferencia);
+  }, [fechaPreferencia]);
 
   useEffect(() => {
     obtenerEstadoTurnos(token)
