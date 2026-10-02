@@ -179,10 +179,22 @@ app.get(
   turnoController.obtenerEstadoSemanal
 );
 
+app.get(
+  "/api/v1/paciente/turnos/medico",
+  verificarTokenPaciente,
+  turnoController.obtenerMedicoAsignado
+);
+
 app.put(
   "/api/v1/paciente/turnos/cancelar/:id",
   verificarTokenPaciente,
   turnoController.cancelarTurno
+);
+
+app.get(
+  "/api/v1/paciente/turnos/proximos",
+  verificarTokenPaciente,
+  turnoController.obtenerProximosTurnos
 );
 
 export default app;
