@@ -299,3 +299,40 @@
     background-color: #fee2e2;
     color: #b91c1c;
 }
+
+.th-accion {
+    text-align: center;
+    width: 110px;
+}
+
+.td-accion {
+    text-align: center;
+}
+
+.btn-cancelar {
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+
+.btn-cancelar:disabled {
+    border-color: #e2e8f0;
+    color: #94a3b8;
+    background: #f8fafc;
+    cursor: not-allowed;
+}

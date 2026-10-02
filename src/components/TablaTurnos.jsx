@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatearFechaTexto } from '../helpers/dateUtils';
 
-export default function TurnoTable({ turnos = [] }) {
+export default function TurnoTable({ turnos = [], onCancelarTurno }) {
   const obtenerClaseBadge = (estado) => {
     switch (estado?.toUpperCase()) {
       case 'PENDIENTE':
@@ -13,6 +13,12 @@ export default function TurnoTable({ turnos = [] }) {
         return 'turno-badge badge-cancelado';
       default:
         return 'turno-badge badge-default';
+    }
+  };
+
+  const handleCancelar = (turno) => {
+    if (onCancelarTurno) {
+      onCancelarTurno(turno);
     }
   };
 
@@ -34,44 +40,62 @@ export default function TurnoTable({ turnos = [] }) {
             <th>Motivo</th>
             <th>Fecha y Hora</th>
             <th className="th-estado">Estado</th>
+            <th className="th-accion">Acción</th>
           </tr>
         </thead>
         <tbody>
-          {turnos.map((turno) => (
-            <tr key={turno._id || turno.createdAt}>
-              <td data-label="DNI" className="td-dni">
-                {turno.pacienteDni || '-'}
-              </td>
+          {turnos.map((turno) => {
+            const yaCancelado = turno.estado?.toUpperCase() === 'CANCELADO';
+            const yaAtendido = turno.estado?.toUpperCase() === 'ATENDIDO';
+            const deshabilitarBoton = yaCancelado || yaAtendido;
 
-              <td data-label="Paciente" className="td-paciente">
-                {turno.pacienteApellido && turno.pacienteNombre
-                  ? `${turno.pacienteApellido}, ${turno.pacienteNombre}`
-                  : turno.pacienteNombre || turno.pacienteApellido || 'No asignado'}
-              </td>
+            return (
+              <tr key={turno._id || turno.createdAt}>
+                <td data-label="DNI" className="td-dni">
+                  {turno.pacienteDni || '-'}
+                </td>
 
+                <td data-label="Paciente" className="td-paciente">
+                  {turno.pacienteApellido && turno.pacienteNombre
+                    ? `${turno.pacienteApellido}, ${turno.pacienteNombre}`
+                    : turno.pacienteNombre || turno.pacienteApellido || 'No asignado'}
+                </td>
 
-              <td data-label="Motivo" className="td-motivo">
-                <span className="motivo-principal">{turno.motivo}</span>
-                {turno.descripcion && turno.descripcion !== turno.motivo && (
-                  <span className="descripcion-secundaria">{turno.descripcion}</span>
-                )}
-              </td>
+                <td data-label="Motivo" className="td-motivo">
+                  <span className="motivo-principal">{turno.motivo}</span>
+                  {turno.descripcion && turno.descripcion !== turno.motivo && (
+                    <span className="descripcion-secundaria">{turno.descripcion}</span>
+                  )}
+                </td>
 
-              <td data-label="Estado" className="td-estado">
-                <span className={obtenerClaseBadge(turno.estado)}>
-                  {turno.estado || 'SIN ESTADO'}
-                </span>
-              </td>
-              <td data-label="Fecha y Hora" className="td-fecha">
-                <span className="fecha-principal">
-                  {formatearFechaTexto(turno.fechaPreferencia)}
-                </span>
-                <span className="hora-secundaria">
-                  {turno.horaPreferencia ? ` - ${turno.horaPreferencia} hs` : ''}
-                </span>
-              </td>
-            </tr>
-          ))}
+                <td data-label="Fecha y Hora" className="td-fecha">
+                  <span className="fecha-principal">
+                    {formatearFechaTexto(turno.fechaPreferencia)}
+                  </span>
+                  <span className="hora-secundaria">
+                    {turno.horaPreferencia ? ` - ${turno.horaPreferencia} hs` : ''}
+                  </span>
+                </td>
+
+                <td data-label="Estado" className="td-estado">
+                  <span className={obtenerClaseBadge(turno.estado)}>
+                    {turno.estado || 'SIN ESTADO'}
+                  </span>
+                </td>
+
+                <td data-label="Acción" className="td-accion">
+                  <button
+                    type="button"
+                    className="btn-cancelar"
+                    disabled={deshabilitarBoton}
+                    onClick={() => handleCancelar(turno)}
+                  >
+                    {yaCancelado ? 'Cancelado' : 'Cancelar'}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
