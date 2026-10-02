@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { solicitarTurno, obtenerEstadoTurnos } from "../data/auth.js";
 import { getRangoFechasSemanaActual, generarHorarios } from "../helpers/dateUtils.js";
+import Modal from "./Modal.jsx";
 import "../styles/turno.css";
 
 function TurnoPaciente({ token, dni, onCancel }) {
@@ -11,10 +12,16 @@ function TurnoPaciente({ token, dni, onCancel }) {
   
   const [cargando, setCargando] = useState(false);
   const [turnoExistente, setTurnoExistente] = useState(null);
+  const [medicoNombre, setMedicoNombre] = useState("Médico de cabecera");
+
+  const [modalConfig, setModalConfig] = useState({
+    visible: false,
+    status: null, // 'Cargando' | 'Ok' | 'Fallo'
+    message: "",
+  });
 
   const { min: fechaMin, max: fechaMax } = useMemo(() => getRangoFechasSemanaActual(), []);
-  const [medicoNombre, setMedicoNombre] = useState("Médico de cabecera");
-  
+
   useEffect(() => {
     if (fechaMin && !fechaPreferencia) {
       setFechaPreferencia(fechaMin);
@@ -48,6 +55,12 @@ function TurnoPaciente({ token, dni, onCancel }) {
     if (!isFormValid) return;
 
     setCargando(true);
+    setModalConfig({
+      visible: true,
+      status: "Cargando",
+      message: "Procesando la solicitud de turno...",
+    });
+
     try {
       const payload = {
         pacienteDni: dni,
@@ -58,22 +71,35 @@ function TurnoPaciente({ token, dni, onCancel }) {
       };
 
       const resultado = await solicitarTurno(token, payload);
-      
       const turnoObtenido = resultado?.turno || resultado;
-      setTurnoExistente(turnoObtenido);
 
       if (turnoObtenido?.medicoNombre) {
         setMedicoNombre(turnoObtenido.medicoNombre);
       }
-      
+
+      setModalConfig({
+        visible: true,
+        status: "Ok",
+        message: "Se agendó su turno exitosamente.",
+      });
+
+      setTurnoExistente(turnoObtenido);
     } catch (error) {
-      alert(error.message || "Ocurrió un error al solicitar el turno.");
+      setModalConfig({
+        visible: true,
+        status: "Fallo",
+        message: "Hubo un error agendando su turno. Inténtalo más tarde.",
+      });
     } finally {
       setCargando(false);
     }
   };
 
-  if (turnoExistente) {
+  const handleCloseModal = () => {
+    setModalConfig({ visible: false, status: null, message: "" });
+  };
+
+  if (turnoExistente && !modalConfig.visible) {
     return (
       <div className="turno-status-card">
         <h2>Mis Turnos</h2>
@@ -110,20 +136,8 @@ function TurnoPaciente({ token, dni, onCancel }) {
             />
           </div>
 
-{/*
-           <div className="form-group">
-            <label htmlFor="descripcion">Descripción (opcional)</label>
-            <textarea
-              id="descripcion"
-              rows="3"
-              placeholder="Ingrese detalles o comentarios adicionales..."
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-            />
-          </div>
-*/}
           <div className="form-group">
-            <label htmlFor="fecha">Preferencia de día (Semana actual)</label>
+            <label htmlFor="fecha">Preferencia de día</label>
             <input
               id="fecha"
               type="date"
@@ -172,6 +186,14 @@ function TurnoPaciente({ token, dni, onCancel }) {
           </div>
         </form>
       </div>
+
+      {modalConfig.visible && (
+        <Modal
+          status={modalConfig.status}
+          message={modalConfig.message}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
