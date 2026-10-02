@@ -11,8 +11,9 @@
         "build": "tsc",
         "start": "node dist/server.js",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-        "seed:ordenes": "ts-node scripts/seedOrdenes.ts",
-        "seed:turnos": "ts-node scripts/seedTurnos.ts"
+        "seed:ordenes": "tsx src/seeds/seed-orders.ts",
+        "seed:turnos": "tsx src/seeds/seed-turnos.ts",
+        "clean:turnos": "tsx src/seeds/seed-turnos.ts --clean-only"
     },
     "keywords": [],
     "author": "",
