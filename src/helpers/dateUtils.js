@@ -6,9 +6,11 @@ import {
   getHours,
   getMinutes,
   isToday,
+  isValid,
+  differenceInMilliseconds,
   parseISO,
 } from "date-fns";
-
+import { es } from "date-fns/locale";
 /**
  * Formatea una fecha como YYYY-MM-DD en horario local.
  */
@@ -126,4 +128,62 @@ export const generarHorarios = (fechaSeleccionada) => {
   }
 
   return horarios;
+};
+
+export const formatearFechaTexto = (fechaStr) => {
+  if (!fechaStr || typeof fechaStr !== "string") {
+    return "";
+  }
+
+  const soloFecha = fechaStr.includes("T")
+    ? fechaStr.split("T")[0]
+    : fechaStr;
+
+  const fecha = parseISO(soloFecha);
+
+  if (!isValid(fecha)) {
+    return fechaStr;
+  }
+
+  return format(fecha, "d 'de' MMMM 'de' yyyy", {
+    locale: es,
+  });
+};
+
+/**
+ * Comprueba si un turno puede cancelarse por el plazo de 24 horas.
+ *
+ * Si la API proporciona turno.cancelable como booleano,
+ * ese valor tiene prioridad.
+ */
+export const esCancelable24hs = (turno) => {
+  if (typeof turno?.cancelable === "boolean") {
+    return turno.cancelable;
+  }
+
+  const fechaRaw = turno?.fechaPreferencia || turno?.fecha;
+  const hora = turno?.horaPreferencia || turno?.hora;
+
+  if (!fechaRaw || !hora) {
+    return false;
+  }
+
+  const fechaLimpia = fechaRaw.includes("T")
+    ? fechaRaw.split("T")[0]
+    : fechaRaw;
+
+  const fechaHoraTurno = parseISO(
+    `${fechaLimpia}T${hora}:00`
+  );
+
+  if (!isValid(fechaHoraTurno)) {
+    return false;
+  }
+
+  const diferencia = differenceInMilliseconds(
+    fechaHoraTurno,
+    new Date()
+  );
+
+  return diferencia >= 24 * 60 * 60 * 1000;
 };

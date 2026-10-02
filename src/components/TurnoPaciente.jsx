@@ -48,10 +48,6 @@ function TurnoPaciente({ token, dni, onCancel }) {
     [fechaPreferencia]
   );
 
-
-
-console.log({ fechaMin, fechaMax });
-
   useEffect(() => {
     setHoraPreferencia("");
   }, [fechaPreferencia]);
@@ -238,6 +234,7 @@ console.log({ fechaMin, fechaMax });
               max={fechaMax}
               value={fechaPreferencia}
               onChange={(e) => setFechaPreferencia(e.target.value)}
+              onClick={(e) => { if (typeof e.currentTarget.showPicker === "function") { e.currentTarget.showPicker(); } }}
               required
               disabled={cargando}
             />

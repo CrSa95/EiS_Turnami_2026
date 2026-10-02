@@ -4,13 +4,9 @@ import { useState } from "react";
 import { cancelarTurno } from "../data/auth.js";
 
 import {
-  differenceInMilliseconds,
-  format,
-  isValid,
-  parseISO,
-} from "date-fns";
-
-import { es } from "date-fns/locale";
+  formatearFechaTexto,
+  esCancelable24hs,
+} from "../helpers/dateUtils.js";
 
 import Modal from "./Modal.jsx";
 
@@ -37,63 +33,17 @@ function TurnoExistenteCard({
   const hora =
     turno.horaPreferencia || turno.hora;
 
-  const formatearFechaTexto = (fechaStr) => {
-    if (!fechaStr) return "";
-
-    const soloFecha = fechaStr.includes("T")
-      ? fechaStr.split("T")[0]
-      : fechaStr;
-
-    const fecha = parseISO(soloFecha);
-
-    if (!isValid(fecha)) {
-      return fechaStr;
-    }
-
-    return format(fecha, "d 'de' MMMM 'de' yyyy", {
-      locale: es,
-    });
-  };
-
   const fechaFormateada = formatearFechaTexto(fechaRaw);
 
-  const esCancelable24hs = () => {
-  
-    if (typeof turno.cancelable === "boolean") {
-      return turno.cancelable;
-    }
-
-    if (!fechaRaw || !hora) {
-      return false;
-    }
-
-    const fechaLimpia = fechaRaw.includes("T")
-      ? fechaRaw.split("T")[0]
-      : fechaRaw;
-
-    const fechaHoraTurno = parseISO(
-      `${fechaLimpia}T${hora}:00`
-    );
-
-    if (!isValid(fechaHoraTurno)) {
-      return false;
-    }
-
-    const diferencia = differenceInMilliseconds(
-      fechaHoraTurno,
-      new Date()
-    );
-
-    return diferencia >= 24 * 60 * 60 * 1000;
-  };
+  const mensajeFueraDePlazo =
+    "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio.";
 
   const handleBotonCancelarClick = () => {
-    if (!esCancelable24hs()) {
+    if (!esCancelable24hs(turno)) {
       setModalState({
         visible: true,
         type: "fuera_de_plazo",
-        message:
-          "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio.",
+        message: mensajeFueraDePlazo,
       });
 
       return;
@@ -109,6 +59,31 @@ function TurnoExistenteCard({
   const ejecutarCancelacion = async () => {
     if (cargando) return;
 
+    // Volver a validar el plazo antes de enviar la solicitud.
+    if (!esCancelable24hs(turno)) {
+      setModalState({
+        visible: true,
+        type: "fuera_de_plazo",
+        message: mensajeFueraDePlazo,
+      });
+
+      return;
+    }
+
+    const idTurno =
+      turno.id || turno._id || turno.idTurno;
+
+    if (!idTurno) {
+      setModalState({
+        visible: true,
+        type: "error",
+        message:
+          "Ocurrió un error al intentar cancelar el turno. Por favor, intente nuevamente.",
+      });
+
+      return;
+    }
+
     setCargando(true);
 
     setModalState({
@@ -118,27 +93,6 @@ function TurnoExistenteCard({
     });
 
     try {
-      // Se vuelve a comprobar el plazo antes de enviar.
-      if (!esCancelable24hs()) {
-        setModalState({
-          visible: true,
-          type: "fuera_de_plazo",
-          message:
-            "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio.",
-        });
-
-        return;
-      }
-
-      const idTurno =
-        turno.id || turno._id || turno.idTurno;
-
-      if (!idTurno) {
-        throw new Error(
-          "No se pudo obtener el identificador del turno."
-        );
-      }
-
       await cancelarTurno(token, idTurno);
 
       setModalState({
