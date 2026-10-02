@@ -79,6 +79,19 @@ export class TurnoController {
       res.status(400).json({ message });
     }
   };
+
+  turnosDelMedico = async(req: Request, res:Response): Promise<void> => {
+    try{
+      const medicoDni = (req as any).user?.dni;
+      const resultado = await this.turnoService.proximosTurnosMedico(medicoDni)
+      res.status(200).json(
+        resultado
+      )
+    }catch(error){
+      const message = error instanceof Error ? error.message : "Error al obtener los turnos proximos";
+      res.status(500).json({ message });
+    }
+  }
 }
 
 export default TurnoController;

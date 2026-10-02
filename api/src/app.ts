@@ -197,4 +197,10 @@ app.get(
   turnoController.obtenerProximosTurnos
 );
 
+app.get(
+  "/api/v1/medico/turnos",
+  verificarTokenMedico,
+  turnoController.turnosDelMedico
+)
+
 export default app;

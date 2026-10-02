@@ -163,6 +163,12 @@ export class TurnoService {
       turno: turnoCancelado,
     };
   }
+
+  async proximosTurnosMedico(medicoDNI: String){
+    const turnos = await this.turnoDAO.turnosDelMedico(medicoDNI)
+
+    return turnos
+  }
 }
 
 export default TurnoService;

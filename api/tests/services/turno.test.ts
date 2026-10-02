@@ -39,6 +39,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       cancelarTurno: jest.fn(),
       obtenerProximosTurnos: jest.fn(),
       obtenerMedicoAsignado: jest.fn(),
+      proximosTurnosMedico: jest.fn(),
     };
 
     turnoController = new TurnoController(mockTurnoService);
@@ -269,4 +270,51 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       expect(jsonMock).toHaveBeenCalledWith({ message: errorSinMedico.message });
     });
   });
+
+  describe("GET /api/v1/medico/turnos", ()=>{
+    
+    const turnosMedicoMock = [
+      {
+        id: "t-200",
+        pacienteDni: "12345678",
+        fechaPreferencia: "2026-10-20T10:00:00Z",
+        horaPreferencia: "10:00",
+        estado: "CONFIRMADO",
+        motivo: "Chequeo general",
+      },
+      {
+        id: "t-201",
+        pacienteDni: "11223344",
+        fechaPreferencia: "2026-10-20T11:30:00Z",
+        horaPreferencia: "11:30",
+        estado: "PENDIENTE",
+        motivo: "Lectura de estudios",
+      },
+    ];
+
+    it("debería obtener la lista de turnos asignados al médico con HTTP 200", async () => {
+      req.user = { dni: "87654321" };
+      mockTurnoService.proximosTurnosMedico.mockResolvedValue(turnosMedicoMock);
+
+      await turnoController.turnosDelMedico(req as Request, res as Response);
+
+      expect(mockTurnoService.proximosTurnosMedico).toHaveBeenCalledWith("87654321");
+      expect(res.status).toHaveBeenCalledWith(200);
+
+      expect(jsonMock).toHaveBeenCalledWith(turnosMedicoMock);
+    });
+
+    it("debería responder con HTTP 500 si ocurre un error inesperado al obtener los turnos", async () => {
+      req.user = { dni: "87654321" };
+
+      const errorServicio = new Error("Error de conexión al buscar los turnos del médico");
+      mockTurnoService.proximosTurnosMedico.mockRejectedValue(errorServicio);
+
+      await turnoController.turnosDelMedico(req as Request, res as Response);
+
+      expect(mockTurnoService.proximosTurnosMedico).toHaveBeenCalledWith("87654321");
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(jsonMock).toHaveBeenCalledWith({ message: errorServicio.message });
+    });
+  })
 });
