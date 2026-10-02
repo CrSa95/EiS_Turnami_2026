@@ -23,6 +23,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
     req = {
       body: {},
       query: {},
+      params: {},
       headers: {},
     };
 
@@ -34,6 +35,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
     mockTurnoService = {
       solicitarTurno: jest.fn(),
       obtenerEstadoTurnoSemanal: jest.fn(),
+      cancelarTurno: jest.fn(), // <--- Agregamos el mock de cancelarTurno
     };
 
     // Instanciamos el controlador inyectando el servicio mockeado
@@ -62,8 +64,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
         horaPreferencia: "11:00",
         motivo: "Chequeo general",
       };
-
-      // Simulamos que la creación fue exitosa
+    
       const turnoCreadoMock = {
         id: "turno-999",
         pacienteDni: "12345678",
@@ -72,11 +73,16 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
         horaPreferencia: "11:00",
         estado: "PENDIENTE",
       };
-
-      mockTurnoService.solicitarTurno.mockResolvedValue(turnoCreadoMock);
-
+    
+      const servicioResponseMock = {
+        mensaje: "Se solicito un turno con el médico por el motivo Chequeo general, espere respuesta",
+        turno: turnoCreadoMock
+      };
+    
+      mockTurnoService.solicitarTurno.mockResolvedValue(servicioResponseMock);
+    
       await turnoController.solicitarTurno(req as Request, res as Response);
-
+    
       expect(mockTurnoService.solicitarTurno).toHaveBeenCalledWith({
         pacienteDni: "12345678",
         medicoDni: "87654321",
@@ -86,7 +92,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
         descripcion: undefined
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(jsonMock).toHaveBeenCalledWith(turnoCreadoMock);
+      expect(jsonMock).toHaveBeenCalledWith(servicioResponseMock);
     });
 
     it("debería responder con 400 Bad Request si el horario solicitado no está disponible", async () => {
@@ -137,6 +143,56 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(jsonMock).toHaveBeenCalledWith({ message: "Error al obtener estado de turnos" });
+    });
+  });
+
+  describe("PUT /api/v1/paciente/turnos/cancelar/:id (cancelarTurno)", () => {
+    it("debería responder con 400 Bad Request si no se proporciona un ID válido en los parámetros", async () => {
+      req.user = { dni: "12345678" };
+      req.params = {}; // o req.params = { id: "" };
+        
+      await turnoController.cancelarTurno(req as Request, res as Response);
+        
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: "Identificador de turno no válido.",
+      });
+      expect(mockTurnoService.cancelarTurno).not.toHaveBeenCalled();
+    });
+
+    it("debería cancelar el turno exitosamente y responder con 200 OK", async () => {
+      req.user = { dni: "12345678" };
+      req.params = { id: "turno-123" };
+
+      const resultadoMock = {
+        mensaje: "El turno ha sido cancelado exitosamente.",
+        turno: { id: "turno-123", estado: "CANCELADO" },
+      };
+
+      mockTurnoService.cancelarTurno.mockResolvedValue(resultadoMock);
+
+      await turnoController.cancelarTurno(req as Request, res as Response);
+
+      expect(mockTurnoService.cancelarTurno).toHaveBeenCalledWith("turno-123", "12345678");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith(resultadoMock);
+    });
+
+    it("debería responder con 400 Bad Request si la cancelación falla por regla de negocio (ej. menos de 24hs)", async () => {
+      req.user = { dni: "12345678" };
+      req.params = { id: "turno-123" };
+
+      const errorProximidad = new Error(
+        "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio."
+      );
+
+      mockTurnoService.cancelarTurno.mockRejectedValue(errorProximidad);
+
+      await turnoController.cancelarTurno(req as Request, res as Response);
+
+      expect(mockTurnoService.cancelarTurno).toHaveBeenCalledWith("turno-123", "12345678");
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({ message: errorProximidad.message });
     });
   });
 });
