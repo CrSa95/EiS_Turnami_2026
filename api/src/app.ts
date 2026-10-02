@@ -179,4 +179,10 @@ app.get(
   turnoController.obtenerEstadoSemanal
 );
 
+app.put(
+  "/api/v1/paciente/turnos/cancelar/:id",
+  verificarTokenPaciente,
+  turnoController.cancelarTurno
+);
+
 export default app;

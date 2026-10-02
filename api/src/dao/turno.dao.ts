@@ -13,5 +13,17 @@ export class TurnoDAO {
     const nuevoTurno = new TurnoModel(datosTurno);
     return await nuevoTurno.save();
   }
+
+  async obtenerTurnoPorId(id: string): Promise<ITurno | null> {
+    return await TurnoModel.findById(id);
+  }
+
+  async cancelarTurno(id: string): Promise<ITurno | null> {
+    return await TurnoModel.findByIdAndUpdate(
+      id,
+      { estado: EstadoTurno.CANCELADO },
+      { new: true }
+    );
+  }
 }
 export default TurnoDAO;
