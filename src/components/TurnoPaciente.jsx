@@ -1,60 +1,122 @@
+
 import { useState, useEffect, useMemo } from "react";
-import { solicitarTurno, obtenerEstadoTurnos } from "../data/auth.js";
-import { getRangoFechasSemanaActual, generarHorarios } from "../helpers/dateUtils.js";
+
+import {
+  solicitarTurno,
+  obtenerEstadoTurnos,
+} from "../data/auth.js";
+
+import {
+  getRangoFechasSemanaActual,
+  generarHorarios,
+} from "../helpers/dateUtils.js";
+
 import Modal from "./Modal.jsx";
+import TurnoExistenteCard from "./TurnoExistenteCard.jsx";
+
 import "../styles/turno.css";
 
 function TurnoPaciente({ token, dni, onCancel }) {
-  const [motivo, setMotivo] = useState("Revisión clínica semanal");
-  const [descripcion, setDescripcion] = useState("");
+  const [descripcion, setDescripcion] = useState(
+    "Revisión clínica semanal"
+  );
+
+  const { min: fechaMin, max: fechaMax } = useMemo(
+    () => getRangoFechasSemanaActual(),
+    []
+  );
+
   const [fechaPreferencia, setFechaPreferencia] = useState("");
   const [horaPreferencia, setHoraPreferencia] = useState("");
-  
+
   const [cargando, setCargando] = useState(false);
+  const [consultandoTurno, setConsultandoTurno] = useState(true);
+
   const [turnoExistente, setTurnoExistente] = useState(null);
-  const [medicoNombre, setMedicoNombre] = useState("Médico de cabecera");
+  const [medicoNombre, setMedicoNombre] = useState(
+    "Médico de cabecera"
+  );
 
   const [modalConfig, setModalConfig] = useState({
     visible: false,
-    status: null, // 'Cargando' | 'Ok' | 'Fallo'
+    status: null,
     message: "",
   });
 
-  const { min: fechaMin, max: fechaMax } = useMemo(() => getRangoFechasSemanaActual(), []);
+  const opcionesHorarias = useMemo(
+    () => generarHorarios(fechaPreferencia),
+    [fechaPreferencia]
+  );
 
   useEffect(() => {
-    if (fechaMin && !fechaPreferencia) {
-      setFechaPreferencia(fechaMin);
-    }
-  }, [fechaMin]);
-
-  const opcionesHorarias = useMemo(() => {
-    return generarHorarios(fechaPreferencia);
+    setHoraPreferencia("");
   }, [fechaPreferencia]);
 
   useEffect(() => {
-    obtenerEstadoTurnos(token)
-      .then((data) => {
-        const turnoData = data?.turno || data;
-        if (turnoData && (turnoData.estado || turnoData.id || turnoData._id || turnoData.pacienteDni)) {
+    let activo = true;
+
+    const cargarTurno = async () => {
+      setConsultandoTurno(true);
+
+      try {
+        const data = await obtenerEstadoTurnos(token);
+
+        if (!activo) return;
+
+        const turnoData = data?.turno ?? data;
+
+        const tieneTurno =
+          turnoData &&
+          (turnoData.estado ||
+            turnoData.id ||
+            turnoData._id ||
+            turnoData.idTurno ||
+            turnoData.pacienteDni);
+
+        if (tieneTurno) {
           setTurnoExistente(turnoData);
+
           if (turnoData.medicoNombre) {
             setMedicoNombre(turnoData.medicoNombre);
           }
         }
-      })
-      .catch((err) => {
-        console.error("Error al consultar el estado de turnos:", err);
-      });
+      } catch (error) {
+        console.error(
+          "Error al consultar el estado de turnos:",
+          error
+        );
+      } finally {
+        if (activo) {
+          setConsultandoTurno(false);
+        }
+      }
+    };
+
+    cargarTurno();
+
+    return () => {
+      activo = false;
+    };
   }, [token]);
 
-  const isFormValid = fechaPreferencia.trim() !== "" && horaPreferencia.trim() !== "";
+  const fechaValida =
+    fechaPreferencia >= fechaMin &&
+    fechaPreferencia <= fechaMax;
+
+  const isFormValid =
+    fechaValida &&
+    horaPreferencia !== "" &&
+    opcionesHorarias.includes(horaPreferencia);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid) return;
+
+    if (!isFormValid || cargando || turnoExistente) {
+      return;
+    }
 
     setCargando(true);
+
     setModalConfig({
       visible: true,
       status: "Cargando",
@@ -64,31 +126,41 @@ function TurnoPaciente({ token, dni, onCancel }) {
     try {
       const payload = {
         pacienteDni: dni,
-        motivo,
+
+        motivo: descripcion,
         descripcion,
+
         fechaPreferencia,
         horaPreferencia,
       };
 
       const resultado = await solicitarTurno(token, payload);
-      const turnoObtenido = resultado?.turno || resultado;
 
-      if (turnoObtenido?.medicoNombre) {
+      const turnoObtenido = resultado?.turno ?? resultado;
+
+      if (!turnoObtenido) {
+        throw new Error("La respuesta no contiene el turno.");
+      }
+
+      if (turnoObtenido.medicoNombre) {
         setMedicoNombre(turnoObtenido.medicoNombre);
       }
+
+      setTurnoExistente(turnoObtenido);
 
       setModalConfig({
         visible: true,
         status: "Ok",
         message: "Se agendó su turno exitosamente.",
       });
-
-      setTurnoExistente(turnoObtenido);
     } catch (error) {
+      console.error("Error al solicitar el turno:", error);
+
       setModalConfig({
         visible: true,
         status: "Fallo",
-        message: "Hubo un error agendando su turno. Inténtalo más tarde.",
+        message:
+          "Hubo un error agendando su turno. Inténtalo más tarde.",
       });
     } finally {
       setCargando(false);
@@ -96,49 +168,65 @@ function TurnoPaciente({ token, dni, onCancel }) {
   };
 
   const handleCloseModal = () => {
-    setModalConfig({ visible: false, status: null, message: "" });
+    setModalConfig({
+      visible: false,
+      status: null,
+      message: "",
+    });
   };
+
+  const handleTurnoCancelado = () => {
+    setTurnoExistente(null);
+    setFechaPreferencia("");
+    setHoraPreferencia("");
+    setDescripcion("Revisión clínica semanal");
+  };
+
+  if (consultandoTurno) {
+    return <p>Consultando tus turnos...</p>;
+  }
 
   if (turnoExistente && !modalConfig.visible) {
     return (
-      <div className="turno-status-card">
-        <h2>Mis Turnos</h2>
-        <p className="mensaje-confirmacion">
-          {`Se solicitó un turno con Dr/a ${medicoNombre}, espere respuesta.`}
-        </p>
-
-        <div className="acciones">
-          <button type="button" disabled className="btn-disabled">
-            Esperando respuesta del médico
-          </button>
-          <button type="button" onClick={onCancel} className="btn-secondary">
-            Volver al inicio
-          </button>
-        </div>
-      </div>
+      <TurnoExistenteCard
+        turno={turnoExistente}
+        token={token}
+        onTurnoCancelado={handleTurnoCancelado}
+        onVolver={onCancel}
+      />
     );
   }
 
   return (
     <div className="turnos">
-      <h2>Reservar Turno</h2>
-      <h4>Médico de cabera: "Dr/a Juan Perez"</h4>
-      
+      <h2>Mis turnos</h2>
+
+      <h4>
+        Médico de cabecera: Dr/a. {medicoNombre}
+      </h4>
+
       <div className="turno-form-container">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="motivo">Motivo de consulta</label>
-            <input
-              id="motivo"
-              type="text"
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              required
+            <label htmlFor="descripcion">
+              Descripción / motivo de consulta
+            </label>
+
+            <textarea
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Describí el motivo de tu consulta"
+              rows={3}
+              disabled={cargando}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="fecha">Preferencia de día</label>
+            <label htmlFor="fecha">
+              Preferencia de día
+            </label>
+
             <input
               id="fecha"
               type="date"
@@ -146,32 +234,51 @@ function TurnoPaciente({ token, dni, onCancel }) {
               max={fechaMax}
               value={fechaPreferencia}
               onChange={(e) => setFechaPreferencia(e.target.value)}
+              onClick={(e) => { if (typeof e.currentTarget.showPicker === "function") { e.currentTarget.showPicker(); } }}
               required
+              disabled={cargando}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="hora">Preferencia horaria</label>
+            <label htmlFor="hora">
+              Preferencia horaria
+            </label>
+
             <select
               id="hora"
               value={horaPreferencia}
               onChange={(e) => setHoraPreferencia(e.target.value)}
               required
+              disabled={cargando || opcionesHorarias.length === 0}
             >
-              <option value="">-- Seleccionar horario --</option>
+              <option value="">
+                -- Seleccionar horario --
+              </option>
+
               {opcionesHorarias.map((horario) => (
                 <option key={horario} value={horario}>
                   {horario} hs
                 </option>
               ))}
             </select>
+
+            {fechaPreferencia && opcionesHorarias.length === 0 && (
+              <p role="status">
+                No hay horarios disponibles para esta fecha.
+              </p>
+            )}
           </div>
 
           <div className="form-actions">
             <button
               type="submit"
-              disabled={!isFormValid || cargando}
-              className={`btn-primary ${!isFormValid || cargando ? "btn-disabled" : ""}`}
+              disabled={!isFormValid || cargando || !!turnoExistente}
+              className={`btn-primary ${
+                !isFormValid || cargando || turnoExistente
+                  ? "btn-disabled"
+                  : ""
+              }`}
             >
               {cargando ? "Enviando..." : "Enviar"}
             </button>

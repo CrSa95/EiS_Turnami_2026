@@ -39,5 +39,24 @@ export class TurnoController {
       res.status(500).json({ message: "Error al obtener estado de turnos" });
     }
   };
+
+
+  cancelarTurno = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const pacienteDni = (req as any).user?.dni;
+    const { id } = req.params;
+
+    if (!id || typeof id !== "string") {
+      res.status(400).json({ message: "Identificador de turno no válido." });
+      return;
+    }
+
+    const resultado = await this.turnoService.cancelarTurno(id, pacienteDni);
+    res.status(200).json(resultado);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Error al cancelar el turno";
+    res.status(400).json({ message });
+  }
+};
 }
 export default TurnoController;

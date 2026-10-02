@@ -87,6 +87,42 @@ export class TurnoService {
       turno: turnoActivo || null
     };
   }
+
+  async cancelarTurno(turnoId: string, pacienteDni: string) {
+    const turno = await this.turnoDAO.obtenerTurnoPorId(turnoId);
+
+    if (!turno) {
+      throw new Error("El turno solicitado no existe.");
+    }
+
+    if (turno.pacienteDni !== pacienteDni) {
+      throw new Error("No tiene permisos para cancelar este turno.");
+    }
+
+    if (turno.estado === EstadoTurno.CANCELADO || turno.estado === EstadoTurno.RECHAZADO) {
+      throw new Error("El turno ya se encuentra inactivo.");
+    }
+
+    const fechaTurnoStr = turno.fechaPreferencia.toISOString().split("T")[0]; // YYYY-MM-DD
+    const fechaHoraTurno = new Date(`${fechaTurnoStr}T${turno.horaPreferencia}:00`);
+    const ahora = new Date();
+
+    const diferenciaMs = fechaHoraTurno.getTime() - ahora.getTime();
+    const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+
+    if (diferenciaHoras < 24) {
+      throw new Error(
+        "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio."
+      );
+    }
+
+    const turnoCancelado = await this.turnoDAO.cancelarTurno(turnoId);
+
+    return {
+      mensaje: "El turno ha sido cancelado exitosamente.",
+      turno: turnoCancelado,
+    };
+  }
 }
 
 export default TurnoService;

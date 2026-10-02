@@ -14,6 +14,8 @@ const endpoints = {
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/rechazar`,
   patientTurnos: `${API_BASE_URL}/api/v1/paciente/turnos`,
   patientEstadoTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/estado`,
+  patientCancelarTurno: (idTurno) =>
+    `${API_BASE_URL}/api/v1/paciente/turnos/cancelar/${idTurno}`,
 };
 
 const TEST_SESSION = {
@@ -166,5 +168,14 @@ export const solicitarTurno = async (accessToken, payload) => {
       'Authorization': `Bearer ${accessToken}`
     },
     body: JSON.stringify(payload)
+  });
+};
+
+export const cancelarTurno = async (accessToken, idTurno) => {
+  return requestEndpoint(endpoints.patientCancelarTurno(idTurno), {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
 };
