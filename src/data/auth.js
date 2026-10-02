@@ -13,6 +13,7 @@ const endpoints = {
   rejectRecipe: (idReceta) =>
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/rechazar`,
   obtenerProximosTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/proximos`,
+  obtenerTurnosAsignadosAlMedico: `${API_BASE_URL}/api/v1/medico/turnos`,
   patientTurnos: `${API_BASE_URL}/api/v1/paciente/turnos`,
   patientMedico: `${API_BASE_URL}/api/v1/paciente/turnos/medico`,
   patientEstadoTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/estado`,
@@ -39,9 +40,9 @@ async function request(role, options = {}) {
   if (!response.ok) {
     throw new Error(
       payload.mensaje ||
-        payload.message ||
-        payload.error ||
-        "No fue posible iniciar sesión. Intentá nuevamente.",
+      payload.message ||
+      payload.error ||
+      "No fue posible iniciar sesión. Intentá nuevamente.",
     );
   }
 
@@ -55,9 +56,9 @@ async function requestEndpoint(endpoint, options = {}) {
   if (!response.ok) {
     throw new Error(
       payload.mensaje ||
-        payload.message ||
-        payload.error ||
-        "No fue posible completar la solicitud. Intentá nuevamente.",
+      payload.message ||
+      payload.error ||
+      "No fue posible completar la solicitud. Intentá nuevamente.",
     );
   }
 
@@ -193,6 +194,15 @@ export const obtenerProximosTurnos = async (accessToken) => {
 
 export const obtenerMedicoAsignado = async (accessToken) => {
   return requestEndpoint(endpoints.patientMedico, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+}
+
+export const obtenerTurnosAsignadosAlMedico = async (accessToken) => {
+  return requestEndpoint(endpoints.obtenerTurnosAsignadosAlMedico, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${accessToken}`

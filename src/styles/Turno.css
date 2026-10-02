@@ -174,3 +174,143 @@
     border-radius: 12px;
   }
 }
+
+.turnos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.turno-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 18px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.turno-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.tiempo {
+  display: flex;
+  flex-direction: column;
+}
+
+.fecha {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.hora {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Badges de estado */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.badge-pendiente {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-confirmado {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.badge-cancelado {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-default {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Secciones de contenido */
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.seccion-paciente {
+  display: flex;
+  flex-direction: column;
+}
+
+.nombre-paciente {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.dni-badge {
+  font-size: 0.8rem;
+  color: #475569;
+  margin-top: 3px;
+  font-family: monospace;
+  letter-spacing: 0.3px;
+}
+
+.seccion-motivo {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.motivo-texto {
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.descripcion-texto {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.turnos-vacio {
+  padding: 36px;
+  text-align: center;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+  margin-top: 16px;
+}

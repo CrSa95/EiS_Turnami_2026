@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export enum EstadoTurno {
   PENDIENTE = 'PENDIENTE',
@@ -17,6 +17,12 @@ export interface ITurno extends Document {
   horaPreferencia: string;
   estado: EstadoTurno;
   semanaAnio: string;
+}
+
+export interface ITurnoConPaciente extends Omit<ITurno, keyof Document> {
+  _id: Types.ObjectId | string;
+  pacienteNombre?: string;
+  pacienteApellido?: string;
 }
 
 const TurnoSchema: Schema = new Schema(

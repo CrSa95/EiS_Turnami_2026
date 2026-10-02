@@ -1,4 +1,4 @@
-import { TurnoModel, EstadoTurno, ITurno } from '../model/turno.model.js';
+import { TurnoModel, EstadoTurno, ITurno, ITurnoConPaciente } from '../model/turno.model.js';
 
 export class TurnoDAO {
   async buscarTurnosPorEstado(pacienteDni: string, semanaAnio?: string, estados: string[] = []) {
@@ -33,6 +33,48 @@ export class TurnoDAO {
       { estado: EstadoTurno.CANCELADO },
       { new: true }
     );
+  }
+
+  async turnosDelMedico(idMedico: String): Promise<ITurnoConPaciente[]> {
+    return await TurnoModel.aggregate([
+      {
+        $match: {
+          medicoDni: idMedico.toString()
+        }
+      },
+
+      {
+      $lookup: {
+        from: 'pacientes',
+        localField: 'pacienteDni',
+        foreignField: 'dni',
+        as: 'pacienteInfo'
+      }
+      },
+      {
+      $unwind: {
+      path: '$pacienteInfo',
+      preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+      $addFields: {
+        pacienteNombre: '$pacienteInfo.nombre',
+        pacienteApellido: '$pacienteInfo.apellido'
+      }
+    },
+      {
+      $sort: {
+        fechaPreferencia: -1,
+        horaPreferencia: -1
+      }
+    },
+    {
+      $project: {
+        pacienteInfo: 0
+      }
+    }
+    ])
   }
 }
 export default TurnoDAO;
