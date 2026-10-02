@@ -1,47 +1,81 @@
-const formatFechaLocal = (fecha) => {
-  const year = fecha.getFullYear();
-  const month = String(fecha.getMonth() + 1).padStart(2, "0");
-  const day = String(fecha.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+
+import {
+  addDays,
+  format,
+  getDay,
+  getHours,
+  getMinutes,
+  isToday,
+  parseISO,
+} from "date-fns";
+
+/**
+ * Formatea una fecha como YYYY-MM-DD en horario local.
+ */
+const formatFechaLocal = (date) => format(date, "yyyy-MM-dd");
+
+/**
+ * Convierte YYYY-MM-DD o un ISO con fecha y hora
+ * en una fecha local basada en el componente de fecha.
+ */
+export const parseFecha = (fechaStr) => {
+  if (!fechaStr || typeof fechaStr !== "string") {
+    return null;
+  }
+
+  const soloFecha = fechaStr.includes("T")
+    ? fechaStr.split("T")[0]
+    : fechaStr;
+
+  const fecha = parseISO(soloFecha);
+
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
 };
 
+/**
+ * Calcula el rango permitido para reservar un turno.
+ *
+ * Reglas:
+ * - Lunes a jueves antes de las 19:00:
+ *   desde mañana hasta el viernes de esa semana.
+ * - Jueves desde las 19:00:
+ *   desde el lunes siguiente hasta el viernes siguiente.
+ * - Viernes antes de las 19:00:
+ *   solo el viernes actual.
+ * - Viernes desde las 19:00:
+ *   desde el lunes siguiente hasta el viernes siguiente.
+ * - Sábado y domingo:
+ *   desde el lunes siguiente hasta el viernes siguiente.
+ */
 export const getRangoFechasSemanaActual = () => {
   const hoy = new Date();
-  const diaSemana = hoy.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mié, 4: Jue, 5: Vie, 6: Sáb
-  const horaActual = hoy.getHours();
+  const diaSemana = getDay(hoy);
+  const horaActual = getHours(hoy);
 
-  let fechaInicio = new Date(hoy);
-  let fechaFin = new Date(hoy);
+  let fechaInicio;
+  let fechaFin;
 
   const esJuevesPost19 = diaSemana === 4 && horaActual >= 19;
   const esViernesPost19 = diaSemana === 5 && horaActual >= 19;
 
-  // Casos donde la semana laboral actual ya cerró -> Muestra la PRÓXIMA SEMANA completa
   if (diaSemana === 6) {
-    // Sábado -> Próximo Lunes (+2) a Viernes (+6)
-    fechaInicio.setDate(hoy.getDate() + 2);
-    fechaFin.setDate(hoy.getDate() + 6);
+    fechaInicio = addDays(hoy, 2);
+    fechaFin = addDays(hoy, 6);
   } else if (diaSemana === 0) {
-    // Domingo -> Próximo Lunes (+1) a Viernes (+5)
-    fechaInicio.setDate(hoy.getDate() + 1);
-    fechaFin.setDate(hoy.getDate() + 5);
+    fechaInicio = addDays(hoy, 1);
+    fechaFin = addDays(hoy, 5);
   } else if (esViernesPost19) {
-    // Viernes post 19hs -> Próximo Lunes (+3) a Viernes (+7)
-    fechaInicio.setDate(hoy.getDate() + 3);
-    fechaFin.setDate(hoy.getDate() + 7);
+    fechaInicio = addDays(hoy, 3);
+    fechaFin = addDays(hoy, 7);
   } else if (esJuevesPost19) {
-    // Jueves post 19hs -> Salta directamente al Próximo Lunes (+4) a Viernes (+8)
-    fechaInicio.setDate(hoy.getDate() + 4);
-    fechaFin.setDate(hoy.getDate() + 8);
+    fechaInicio = addDays(hoy, 4);
+    fechaFin = addDays(hoy, 8);
   } else if (diaSemana === 5) {
-    // Viernes ANTES de las 19hs -> Solo permite pedir para el mismo Viernes de hoy
-    fechaInicio = hoy;
-    fechaFin = hoy;
+    fechaInicio = addDays(hoy, 3);
+    fechaFin = addDays(hoy, 7);
   } else {
-    // Lunes, Martes o Miércoles / Jueves antes de las 19hs
-    fechaInicio.setDate(hoy.getDate() + 1);
-    const diasHastaViernes = 5 - diaSemana;
-    fechaFin.setDate(hoy.getDate() + diasHastaViernes);
+    fechaInicio = addDays(hoy, 1);
+    fechaFin = addDays(hoy, 5 - diaSemana);
   }
 
   return {
@@ -50,32 +84,45 @@ export const getRangoFechasSemanaActual = () => {
   };
 };
 
+/**
+ * Genera horarios desde las 09:00 hasta las 19:00,
+ * en intervalos de 30 minutos.
+ *
+ * Si la fecha seleccionada es hoy, excluye los horarios
+ * que ya pasaron.
+ */
 export const generarHorarios = (fechaSeleccionada) => {
-  if (!fechaSeleccionada) return [];
+  const fecha = parseFecha(fechaSeleccionada);
+
+  if (!fecha) {
+    return [];
+  }
+
+  const ahora = new Date();
+  const esFechaHoy = isToday(fecha);
+
+  const horaActual = getHours(ahora);
+  const minutosActuales = getMinutes(ahora);
 
   const horarios = [];
-  let hora = 9;
-  let minutos = 0;
 
-  const hoy = new Date();
-  const esHoy = fechaSeleccionada === formatFechaLocal(hoy);
-  const horaActual = hoy.getHours();
-  const minutosActuales = hoy.getMinutes();
+  for (let minutosDelDia = 9 * 60; minutosDelDia <= 19 * 60; minutosDelDia += 30) {
+    const hora = Math.floor(minutosDelDia / 60);
+    const minutos = minutosDelDia % 60;
 
-  while (hora < 19 || (hora === 19 && minutos === 0)) {
-    const yaPaso = esHoy && (hora < horaActual || (hora === horaActual && minutos <= minutosActuales));
+    const yaPaso =
+      esFechaHoy &&
+      (hora < horaActual ||
+        (hora === horaActual && minutos <= minutosActuales));
 
-    if (!yaPaso) {
-      const hStr = hora.toString().padStart(2, "0");
-      const mStr = minutos.toString().padStart(2, "0");
-      horarios.push(`${hStr}:${mStr}`);
+    if (yaPaso) {
+      continue;
     }
 
-    minutos += 30;
-    if (minutos === 60) {
-      minutos = 0;
-      hora += 1;
-    }
+    const horaTexto = String(hora).padStart(2, "0");
+    const minutosTexto = String(minutos).padStart(2, "0");
+
+    horarios.push(`${horaTexto}:${minutosTexto}`);
   }
 
   return horarios;
