@@ -12,7 +12,9 @@ const endpoints = {
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/transcribir`,
   rejectRecipe: (idReceta) =>
     `${API_BASE_URL}/api/v1/medico/images/${idReceta}/rechazar`,
+  obtenerProximosTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/proximos`,
   patientTurnos: `${API_BASE_URL}/api/v1/paciente/turnos`,
+  patientMedico: `${API_BASE_URL}/api/v1/paciente/turnos/medico`,
   patientEstadoTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/estado`,
   patientCancelarTurno: (idTurno) =>
     `${API_BASE_URL}/api/v1/paciente/turnos/cancelar/${idTurno}`,
@@ -179,3 +181,21 @@ export const cancelarTurno = async (accessToken, idTurno) => {
     },
   });
 };
+
+export const obtenerProximosTurnos = async (accessToken) => {
+  return requestEndpoint(endpoints.obtenerProximosTurnos, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+}
+
+export const obtenerMedicoAsignado = async (accessToken) => {
+  return requestEndpoint(endpoints.patientMedico, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+}

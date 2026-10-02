@@ -18,6 +18,7 @@ import ModalReject from "../components/ModalReject";
 import TabView from "../components/TabView";
 import Ordenes from "../components/Ordenes";
 import Turno from "../components/Turno";
+import ProximosTurnos from "../components/ProximosTurnos";
 
 export const States = {
   Error: "Error",
@@ -61,6 +62,8 @@ function HomePage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [rejectRecipeId, setRejectRecipeId] = useState(null);
   const [rejectDocumentType, setRejectDocumentType] = useState("Receta");
+  
+  const [showProximosModal, setShowProximosModal] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -251,6 +254,32 @@ function HomePage() {
         handleLogout={handleLogout}
       />
 
+      {role === "paciente" && (
+        <>
+          <button 
+            className="btn-proximos-turnos" 
+            onClick={() => setShowProximosModal(true)}
+          >
+            Próximos turnos
+          </button>
+
+          {showProximosModal && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <button 
+                  className="modal-close" 
+                  onClick={() => setShowProximosModal(false)}
+                >
+                  ✖
+                </button>
+                <ProximosTurnos token={session.access_token} />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+
       <div>
         <TabView tab={tab} tabs={tabs} setTab={setTab} />
         {tab == "recetas" && (
@@ -297,6 +326,7 @@ function HomePage() {
       />
 
       <ModalState state={state} setState={setState} />
+
     </main>
   );
 }

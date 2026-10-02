@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 import { cancelarTurno } from "../data/auth.js";
@@ -6,12 +5,20 @@ import { cancelarTurno } from "../data/auth.js";
 import {
   formatearFechaTexto,
   esCancelable24hs,
+  getTurnoId,
 } from "../helpers/dateUtils.js";
 
 import Modal from "./Modal.jsx";
 
+const MENSAJE_FUERA_DE_PLAZO =
+  "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio.";
+
+const MENSAJE_ERROR_CANCELACION =
+  "Ocurrió un error al intentar cancelar el turno. Por favor, intente nuevamente.";
+
 function TurnoExistenteCard({
   turno,
+  medicoNombre: medicoNombreProp,
   token,
   onTurnoCancelado,
   onVolver,
@@ -25,7 +32,7 @@ function TurnoExistenteCard({
   });
 
   const medicoNombre =
-    turno.medicoNombre || "Médico de cabecera";
+    turno.medicoNombre || medicoNombreProp || "Médico de cabecera";
 
   const fechaRaw =
     turno.fechaPreferencia || turno.fecha;
@@ -35,15 +42,12 @@ function TurnoExistenteCard({
 
   const fechaFormateada = formatearFechaTexto(fechaRaw);
 
-  const mensajeFueraDePlazo =
-    "El turno no puede ser cancelado por este medio debido a la proximidad de la fecha. Por favor, comuníquese con el consultorio.";
-
   const handleBotonCancelarClick = () => {
     if (!esCancelable24hs(turno)) {
       setModalState({
         visible: true,
         type: "fuera_de_plazo",
-        message: mensajeFueraDePlazo,
+        message: MENSAJE_FUERA_DE_PLAZO,
       });
 
       return;
@@ -64,21 +68,19 @@ function TurnoExistenteCard({
       setModalState({
         visible: true,
         type: "fuera_de_plazo",
-        message: mensajeFueraDePlazo,
+        message: MENSAJE_FUERA_DE_PLAZO,
       });
 
       return;
     }
 
-    const idTurno =
-      turno.id || turno._id || turno.idTurno;
+    const idTurno = getTurnoId(turno);
 
     if (!idTurno) {
       setModalState({
         visible: true,
         type: "error",
-        message:
-          "Ocurrió un error al intentar cancelar el turno. Por favor, intente nuevamente.",
+        message: MENSAJE_ERROR_CANCELACION,
       });
 
       return;
@@ -103,11 +105,16 @@ function TurnoExistenteCard({
     } catch (error) {
       console.error("Error al cancelar el turno:", error);
 
+      // Si el servidor rechazó por plazo (p. ej. desfase de reloj), se
+      // informa lo mismo que en la validación local.
+      const rechazadoPorPlazo = error?.message === MENSAJE_FUERA_DE_PLAZO;
+
       setModalState({
         visible: true,
-        type: "error",
-        message:
-          "Ocurrió un error al intentar cancelar el turno. Por favor, intente nuevamente.",
+        type: rechazadoPorPlazo ? "fuera_de_plazo" : "error",
+        message: rechazadoPorPlazo
+          ? MENSAJE_FUERA_DE_PLAZO
+          : MENSAJE_ERROR_CANCELACION,
       });
     } finally {
       setCargando(false);
@@ -124,7 +131,7 @@ function TurnoExistenteCard({
     });
 
     if (ultimoTipo === "exito") {
-      onTurnoCancelado();
+      onTurnoCancelado(getTurnoId(turno));
     }
   };
 

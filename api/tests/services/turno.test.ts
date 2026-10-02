@@ -32,20 +32,22 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       json: jsonMock as any,
     };
 
+    // INICIALIZACIÓN DE MOCKS COMPLETA
     mockTurnoService = {
       solicitarTurno: jest.fn(),
       obtenerEstadoTurnoSemanal: jest.fn(),
-      cancelarTurno: jest.fn(), // <--- Agregamos el mock de cancelarTurno
+      cancelarTurno: jest.fn(),
+      obtenerProximosTurnos: jest.fn(),
+      obtenerMedicoAsignado: jest.fn(),
     };
 
-    // Instanciamos el controlador inyectando el servicio mockeado
     turnoController = new TurnoController(mockTurnoService);
   });
 
   describe("POST /api/v1/paciente/turnos (solicitarTurno)", () => {
     it("debería responder con 400 Bad Request si los datos fallan o el servicio tira error", async () => {
       req.user = undefined;
-      
+
       mockTurnoService.solicitarTurno.mockRejectedValue(new Error("Error al solicitar turno"));
 
       await turnoController.solicitarTurno(req as Request, res as Response);
@@ -64,7 +66,7 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
         horaPreferencia: "11:00",
         motivo: "Chequeo general",
       };
-    
+
       const turnoCreadoMock = {
         id: "turno-999",
         pacienteDni: "12345678",
@@ -73,23 +75,23 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
         horaPreferencia: "11:00",
         estado: "PENDIENTE",
       };
-    
+
       const servicioResponseMock = {
         mensaje: "Se solicito un turno con el médico por el motivo Chequeo general, espere respuesta",
-        turno: turnoCreadoMock
+        turno: turnoCreadoMock,
       };
-    
+
       mockTurnoService.solicitarTurno.mockResolvedValue(servicioResponseMock);
-    
+
       await turnoController.solicitarTurno(req as Request, res as Response);
-    
+
       expect(mockTurnoService.solicitarTurno).toHaveBeenCalledWith({
         pacienteDni: "12345678",
         medicoDni: "87654321",
         fechaPreferencia: "2026-10-20T11:00:00Z",
         horaPreferencia: "11:00",
         motivo: "Chequeo general",
-        descripcion: undefined
+        descripcion: undefined,
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(jsonMock).toHaveBeenCalledWith(servicioResponseMock);
@@ -137,22 +139,23 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
     it("debería responder con 500 si ocurre un error inesperado al obtener turnos", async () => {
       req.user = { dni: "12345678" };
 
-      mockTurnoService.obtenerEstadoTurnoSemanal.mockRejectedValue(new Error("Error de base de datos"));
+      const dbError = new Error("Error de base de datos");
+      mockTurnoService.obtenerEstadoTurnoSemanal.mockRejectedValue(dbError);
 
       await turnoController.obtenerEstadoSemanal(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith({ message: "Error al obtener estado de turnos" });
+      expect(jsonMock).toHaveBeenCalledWith({ message: dbError.message });
     });
   });
 
   describe("PUT /api/v1/paciente/turnos/cancelar/:id (cancelarTurno)", () => {
     it("debería responder con 400 Bad Request si no se proporciona un ID válido en los parámetros", async () => {
       req.user = { dni: "12345678" };
-      req.params = {}; // o req.params = { id: "" };
-        
+      req.params = {};
+
       await turnoController.cancelarTurno(req as Request, res as Response);
-        
+
       expect(res.status).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
         message: "Identificador de turno no válido.",
@@ -193,6 +196,77 @@ describe("TurnoController - Tests Integrales Ligeros", () => {
       expect(mockTurnoService.cancelarTurno).toHaveBeenCalledWith("turno-123", "12345678");
       expect(res.status).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({ message: errorProximidad.message });
+    });
+  });
+
+  describe("GET /api/v1/paciente/turnos/proximos (obtenerProximosTurnos)", () => {
+    it("debería obtener los próximos turnos del paciente con HTTP 200", async () => {
+      req.user = { dni: "12345678" };
+
+      const proximosTurnosMock = [
+        {
+          id: "t-100",
+          pacienteDni: "12345678",
+          medicoDni: "87654321",
+          fechaPreferencia: "2026-10-25T10:00:00Z",
+          horaPreferencia: "10:00",
+          estado: "CONFIRMADO",
+        },
+      ];
+
+      mockTurnoService.obtenerProximosTurnos.mockResolvedValue(proximosTurnosMock);
+
+      await turnoController.obtenerProximosTurnos(req as Request, res as Response);
+
+      expect(mockTurnoService.obtenerProximosTurnos).toHaveBeenCalledWith("12345678");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith({ turnos: proximosTurnosMock });
+    });
+
+    it("debería responder con HTTP 500 si ocurre un error al obtener los próximos turnos", async () => {
+      req.user = { dni: "12345678" };
+
+      const errorServicio = new Error("Error de conexión con la base de datos");
+      mockTurnoService.obtenerProximosTurnos.mockRejectedValue(errorServicio);
+
+      await turnoController.obtenerProximosTurnos(req as Request, res as Response);
+
+      expect(mockTurnoService.obtenerProximosTurnos).toHaveBeenCalledWith("12345678");
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(jsonMock).toHaveBeenCalledWith({ message: errorServicio.message });
+    });
+  });
+
+  describe("GET /api/v1/paciente/medico-asignado (obtenerMedicoAsignado)", () => {
+    it("debería devolver el médico asignado con status 200 OK", async () => {
+      req.user = { dni: "12345678" };
+
+      const medicoMock = {
+        dni: "87654321",
+        nombre: "Juan",
+        apellido: "Pérez",
+        especialidad: "Clínica médica",
+      };
+
+      mockTurnoService.obtenerMedicoAsignado.mockResolvedValue(medicoMock);
+
+      await turnoController.obtenerMedicoAsignado(req as Request, res as Response);
+
+      expect(mockTurnoService.obtenerMedicoAsignado).toHaveBeenCalledWith("12345678");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith(medicoMock);
+    });
+
+    it("debería responder con 400 Bad Request si ocurre un error al obtener el médico", async () => {
+      req.user = { dni: "12345678" };
+
+      const errorSinMedico = new Error("El paciente no tiene un médico de cabecera asignado");
+      mockTurnoService.obtenerMedicoAsignado.mockRejectedValue(errorSinMedico);
+
+      await turnoController.obtenerMedicoAsignado(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({ message: errorSinMedico.message });
     });
   });
 });

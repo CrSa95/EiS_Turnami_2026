@@ -42,6 +42,62 @@
 .home-welcome h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 6vw, 72px); line-height: 1.08; }
 .home-welcome > p:last-child { color: #5f6f8f; font-size: 17px; }
 
+.btn-proximos-turnos {
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Asegura que se superponga a todo el contenido */
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 95%;
+  max-height: 85vh;
+  overflow-y: auto; /* Agrega scroll si el contenido sobrepasa la altura */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #5f6f8f;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #001f4d;
+}
+
+
 /* Tablet */
 @media (min-width: 561px) and (max-width: 1024px) {
   .home-header,
