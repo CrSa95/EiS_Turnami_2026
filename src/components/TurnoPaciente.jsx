@@ -121,7 +121,8 @@ function TurnoPaciente({ token, dni, onCancel }) {
 
   return (
     <div className="turnos">
-      <h2 className="turnos-title">Reservar Turno</h2>
+      <h2>Reservar Turno</h2>
+      <h4>Médico de cabera: "Dr/a Juan Perez"</h4>
       
       <div className="turno-form-container">
         <form onSubmit={handleSubmit}>
