@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { solicitarTurno, obtenerEstadoTurnos } from "../data/auth.js";
 import { getRangoFechasSemanaActual, generarHorarios } from "../helpers/dateUtils.js";
 import Modal from "./Modal.jsx";
+import TurnoExistenteCard from "./TurnoExistenteCard.jsx";
 import "../styles/turno.css";
 
 function TurnoPaciente({ token, dni, onCancel }) {
@@ -99,30 +100,26 @@ function TurnoPaciente({ token, dni, onCancel }) {
     setModalConfig({ visible: false, status: null, message: "" });
   };
 
-  if (turnoExistente && !modalConfig.visible) {
-    return (
-      <div className="turno-status-card">
-        <h2>Mis Turnos</h2>
-        <p className="mensaje-confirmacion">
-          {`Se solicitó un turno con Dr/a ${medicoNombre}, espere respuesta.`}
-        </p>
+  const handleTurnoCancelado = () => {
+    setTurnoExistente(null); 
+  };
 
-        <div className="acciones">
-          <button type="button" disabled className="btn-disabled">
-            Esperando respuesta del médico
-          </button>
-          <button type="button" onClick={onCancel} className="btn-secondary">
-            Volver al inicio
-          </button>
-        </div>
-      </div>
-    );
+  if (turnoExistente && !modalConfig.visible) {
+  return (
+        <TurnoExistenteCard
+          turno={turnoExistente}
+          token={token}
+          onTurnoCancelado={handleTurnoCancelado}
+          onVolver={onCancel}
+        />
+      );
   }
 
   return (
     <div className="turnos">
       <h2>Reservar Turno</h2>
       <h4>Médico de cabera: "Dr/a Juan Perez"</h4>
+      {/** hardcodeado porque no se obtiene del backend :´( */}
       
       <div className="turno-form-container">
         <form onSubmit={handleSubmit}>
