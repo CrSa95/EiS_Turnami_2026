@@ -1,316 +1,301 @@
 .turnos-layout {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  place-items: center;
-  gap: 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    place-items: center;
+    gap: 24px;
 }
 
 .turnos {
-  margin: 16px;
-  padding: 24px;
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
-  display: flex;
-  flex-direction: column;
-  max-width: 600px;
-  min-width: 400px;
+    margin: 16px;
+    padding: 24px;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    min-width: 400px;
 }
 
 .turnos-title {
-  margin: 0 0 16px;
-  color: #001f4d;
-  font-size: 22px;
+    margin: 0 0 16px;
+    color: #001f4d;
+    font-size: 22px;
 }
 
 .turno-form-container,
 .turno-status-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid #e8edf5;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(15 23 42 / 6%);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid #e8edf5;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(15 23 42 / 6%);
 }
 
 .turno-form-container h2,
 .turno-status-card h2 {
-  margin: 0;
-  color: #1e293b;
-  font-size: 18px;
-  font-weight: 700;
+    margin: 0;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .turno-form-container h3 {
-  margin: 0;
-  color: #334155;
-  font-size: 15px;
-  font-weight: 500;
+    margin: 0;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .form-group label {
-  font-size: 13px;
-  color: #475569;
-  font-weight: 500;
+    font-size: 13px;
+    color: #475569;
+    font-weight: 500;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
-  padding: 8px 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #1e293b;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e293b;
 }
 
 .form-group textarea {
-  resize: vertical;
+    resize: vertical;
 }
 
 .form-actions,
 .acciones {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
 }
 
 .btn-primary {
-  border: 1px solid #2563eb;
-  color: #fff;
-  background: #2563eb;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    border: 1px solid #2563eb;
+    color: #fff;
+    background: #2563eb;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #1d4ed8;
+    background: #1d4ed8;
 }
 
 .btn-primary:disabled {
-  border-color: #cbd5e1;
-  color: #6693d2;
-  background: #286fb5;
-  cursor: not-allowed;
+    border-color: #cbd5e1;
+    color: #6693d2;
+    background: #286fb5;
+    cursor: not-allowed;
 }
 
 .btn-secondary {
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  background: #c3bbbb;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    background: #c3bbbb;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f8fafc;
+    background: #f8fafc;
 }
 
 .btn-secondary:disabled {
-  border-color: #e2e8f0;
-  color: #cbd5e1;
-  background: #f8fafc;
-  cursor: not-allowed;
+    border-color: #e2e8f0;
+    color: #cbd5e1;
+    background: #f8fafc;
+    cursor: not-allowed;
 }
 
 .mensaje-confirmacion {
-  margin: 0;
-  color: #1e293b;
-  font-size: 14px;
-  line-height: 1.4;
+    margin: 0;
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 /* Tablet */
 @media (min-width: 561px) and (max-width: 1024px) {
-  .turnos {
-    width: min(100% - 32px, 680px);
-    min-width: 0;
-    margin: 16px;
-  }
+    .turnos {
+        width: min(100% - 32px, 680px);
+        min-width: 0;
+        margin: 16px;
+    }
 }
 
 /* Celular */
 @media (max-width: 560px) {
-  .turnos-layout {
+    .turnos-layout {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .turnos {
+        width: calc(100% - 24px);
+        min-width: 0;
+        margin: 12px;
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .turnos-title {
+        font-size: 19px;
+    }
+
+    .turno-form-container,
+    .turno-status-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+}
+/* Contenedor principal: define un ancho generoso y centrado */
+.tabla-turnos-wrapper {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .turnos {
-    width: calc(100% - 24px);
-    min-width: 0;
-    margin: 12px;
-    padding: 16px;
-    border-radius: 12px;
-  }
-
-  .turnos-title {
-    font-size: 19px;
-  }
-
-  .turno-form-container,
-  .turno-status-card {
-    padding: 16px;
-    border-radius: 12px;
-  }
+    max-width: 1050px; /* Ancho cómodo para desktop */
+    margin: 20px auto; /* Centrado horizontal */
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.06);
+    overflow-x: auto;
 }
 
-.turnos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+.tabla-turnos {
+    width: 100%;
+    min-width: 650px; /* Evita que las columnas se aplasten */
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+    font-size: 14px;
+    color: #1e293b;
 }
 
-.turno-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  padding: 18px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* Cabecera con más aire */
+.tabla-turnos thead {
+    background-color: #f8fafc;
 }
 
-.turno-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+.tabla-turnos th {
+    padding: 16px 20px; /* Más separación vertical y horizontal */
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 12px;
+.th-estado {
+    text-align: center;
 }
 
-.tiempo {
-  display: flex;
-  flex-direction: column;
+/* Celdas con espaciado amplio */
+.tabla-turnos td {
+    padding: 18px 20px; /* Altura y respiro entre columnas */
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
 }
 
-.fecha {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #0f172a;
+.tabla-turnos tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.hora {
-  font-size: 0.85rem;
-  color: #64748b;
-  font-weight: 500;
+.tabla-turnos tbody tr:hover {
+    background-color: #fbfcfe;
 }
 
-/* Badges de estado */
-.badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: inline-block;
+/* Distribución y anchos recomendados por columna */
+.td-dni {
+    font-family: monospace;
+    font-weight: 600;
+    color: #64748b;
+    width: 130px;
+}
+
+.td-paciente {
+    font-weight: 600;
+    color: #0f172a;
+    min-width: 180px;
+}
+
+.td-fecha {
+    min-width: 220px;
+    white-space: nowrap;
+}
+
+.fecha-principal {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.hora-secundaria {
+    font-weight: 600;
+    color: #2563eb; /* Destaca la hora */
+    margin-left: 4px;
+}
+
+.td-motivo {
+    min-width: 220px;
+    color: #334155;
+}
+
+.td-estado {
+    text-align: center;
+    width: 140px;
+}
+
+/* Badge estilizado */
+.turno-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 9999px; /* Pill redondeado */
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .badge-pendiente {
-  background-color: #fef3c7;
-  color: #b45309;
+    background-color: #fef3c7;
+    color: #b45309;
 }
 
 .badge-confirmado {
-  background-color: #d1fae5;
-  color: #047857;
+    background-color: #d1fae5;
+    color: #065f46;
 }
 
 .badge-cancelado {
-  background-color: #fee2e2;
-  color: #b91c1c;
-}
-
-.badge-default {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-
-/* Secciones de contenido */
-.label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2px;
-  display: block;
-}
-
-.seccion-paciente {
-  display: flex;
-  flex-direction: column;
-}
-
-.nombre-paciente {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.dni-badge {
-  font-size: 0.8rem;
-  color: #475569;
-  margin-top: 3px;
-  font-family: monospace;
-  letter-spacing: 0.3px;
-}
-
-.seccion-motivo {
-  background-color: #f8fafc;
-  border-radius: 8px;
-  padding: 10px 12px;
-  border: 1px solid #f1f5f9;
-}
-
-.motivo-texto {
-  font-size: 0.87rem;
-  font-weight: 500;
-  color: #334155;
-}
-
-.descripcion-texto {
-  font-size: 0.78rem;
-  color: #64748b;
-  margin-top: 4px;
-}
-
-.turnos-vacio {
-  padding: 36px;
-  text-align: center;
-  background-color: #f8fafc;
-  border-radius: 12px;
-  color: #64748b;
-  border: 1px dashed #cbd5e1;
-  margin-top: 16px;
+    background-color: #fee2e2;
+    color: #b91c1c;
 }
