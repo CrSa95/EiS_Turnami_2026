@@ -13,7 +13,7 @@
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
         "seed:ordenes": "tsx src/seeds/seed-orders.ts",
         "seed:turnos": "tsx src/seeds/seed-turnos.ts",
-        "clean:turnos": "tsx src/seeds/seed-turnos.ts --clean-only"
+        "clean:turnos": "tsx src/seeds/seed-turnos.ts --clean-only" 
     },
     "keywords": [],
     "author": "",
