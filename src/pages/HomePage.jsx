@@ -237,7 +237,10 @@ function HomePage() {
   };
   
   const onCancelTurno = () => {
-    setTab(tabs[0].key);
+    if(session.role === "patient"){
+          setTab(tabs[0].key);
+    }
+    setTab(tabs[2].key)
   }
 
 
