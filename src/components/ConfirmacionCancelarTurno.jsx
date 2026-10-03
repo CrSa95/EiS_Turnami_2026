@@ -27,12 +27,12 @@ export default function ConfirmarCancelacionModal({
           ¿Confirma cancelar turno con el paciente {nombreCompleto}?
         </h2>
 
-        <div className="modal-detalle-paciente" style={{ margin: '16px 0', textAlign: 'left' }}>
+        <div className="modal-detalle-paciente">
           <p><strong>DNI:</strong> {turno.pacienteDni || '-'}</p>
           <p><strong>Horario:</strong> {horario}</p>
         </div>
 
-        <div className="modal-acciones" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        <div className="modal-acciones" >
           <button
             type="button"
             className="btn-modal-confirmar"

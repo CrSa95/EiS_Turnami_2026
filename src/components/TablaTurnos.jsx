@@ -20,18 +20,18 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
   };
 
   const handleConfirmarCancelacion = async ()=>{
-    const turno = turnoAConfirmar;
+    const {_id } = turnoAConfirmar;
     setTurnoAConfirmar(null);
 
     if (!onCancelarTurno) return;
-
+    
     setModalFeedback({
       status: 'Cargando',
       message: 'Cancelando el turno...',
     });
 
     try {
-      await onCancelarTurno(turno);
+      await onCancelarTurno(_id);
       setModalFeedback({
         status: 'Ok',
         message: 'Turno cancelado exitosamente.',

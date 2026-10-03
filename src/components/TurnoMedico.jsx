@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {obtenerTurnosAsignadosAlMedico} from "../data/auth"
+import {obtenerTurnosAsignadosAlMedico, cancelarTurnoConPaciente} from "../data/auth"
 import TurnoTable from './TablaTurnos';
 export default function TurnoMedico({token, dni, onCancel}) {
 const [turnos, setTurnos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const handleCancelarTurno = async ()=>{
-    
+  const handleCancelarTurno = async (turnoID)=>{
+      const response = await cancelarTurnoConPaciente(token, turnoID)
+      
+      if(onCancel) onCancel();
   }
   useEffect(() => {
     let montado = true;
@@ -36,7 +38,7 @@ const [turnos, setTurnos] = useState([]);
   return (
     <div>
       <h2>Turnos del médico</h2>
-      <TurnoTable turnos={turnos} onCancel={onCancel}/>
+      <TurnoTable turnos={turnos} onCancelarTurno={handleCancelarTurno}/>
     </div>
   );
 }       
