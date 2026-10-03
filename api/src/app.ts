@@ -203,4 +203,6 @@ app.get(
   turnoController.turnosDelMedico
 )
 
+app.put("/api/v1/medico/turnos/:id/cancelar", turnoController.cancelarTurnoDelPaciente)
+
 export default app;

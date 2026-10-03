@@ -75,6 +75,64 @@
   animation: status-modal-spin 0.8s linear infinite;
 }
 
+.status-modal-confirmacion {
+  text-align: left;
+}
+
+.status-modal-confirmacion h2 {
+  font-size: 20px;
+  line-height: 1.35;
+  color: #263449;
+}
+
+.modal-detalle-paciente {
+  margin: 20px 0;
+  padding: 14px 16px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #edf0f3;
+}
+
+.modal-detalle-paciente p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #485363;
+}
+
+.modal-detalle-paciente strong {
+  color: #263449;
+}
+
+.modal-acciones {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-modal-confirmar {
+  background: #d92d20;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.btn-modal-confirmar:hover {
+  background: #b42318;
+}
+
+.btn-modal-descartar {
+  background: #e2e8f0;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-modal-descartar:hover {
+  background: #cbd5e1;
+  border-color: #94a3b8;
+}
+
+
 @keyframes status-modal-spin {
   to {
     transform: rotate(360deg);
