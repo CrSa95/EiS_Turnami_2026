@@ -92,6 +92,19 @@ export class TurnoController {
       res.status(500).json({ message });
     }
   }
+
+  cancelarTurnoDelPaciente = async(req: Request, res:Response): Promise<void> => {
+    try{
+      const medicoDni = (req as any).user?.dni;
+      const {id} = req.params;
+      const resultado = await this.turnoService.cancelarTurnoDelPaciente(medicoDni, id)
+
+      res.status(200).json(resultado)
+    }catch(error){
+      const message = error instanceof Error ? error.message : "Error al cancelar turno del paciente";
+      res.status(500).json({ message });
+    }
+  }
 }
 
 export default TurnoController;

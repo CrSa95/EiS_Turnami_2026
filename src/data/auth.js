@@ -19,7 +19,7 @@ const endpoints = {
   patientEstadoTurnos: `${API_BASE_URL}/api/v1/paciente/turnos/estado`,
   patientCancelarTurno: (idTurno) =>
     `${API_BASE_URL}/api/v1/paciente/turnos/cancelar/${idTurno}`,
-  medicoCancelarTurno: (idTurno) => `${API_BASE_URL}/api/v1/medico/turnos/${idTurno}`,
+  medicoCancelarTurno: (idTurno) => `${API_BASE_URL}/api/v1/medico/turnos/${idTurno}/cancelar`,
 };
 
 const TEST_SESSION = {

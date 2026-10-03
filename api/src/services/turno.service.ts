@@ -169,6 +169,12 @@ export class TurnoService {
 
     return turnos
   }
+
+  async cancelarTurnoDelPaciente(medicoDNI: String, turnoId: String){
+    const resultado = await this.turnoDAO.cancelarTurnoDelPaciente(medicoDNI, turnoId)
+
+    return resultado;
+  }
 }
 
 export default TurnoService;
