@@ -1,7 +1,49 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { formatearFechaTexto } from '../helpers/dateUtils';
+import ConfirmarCancelacionModal from './ConfirmacionCancelarTurno';
+import Modal from './Modal';
 
 export default function TurnoTable({ turnos = [], onCancelarTurno }) {
+  const [turnoAConfirmar, setTurnoAConfirmar] = useState(null);
+
+  const [modalFeedback, setModalFeedback] = useState({
+    status: null,
+    message: '',
+  });
+
+  const handleClickCancelar = (turno) => {
+    setTurnoAConfirmar(turno);
+  };
+
+  const handleCerrarConfirmacion = () => {
+    setTurnoAConfirmar(null);
+  };
+
+  const handleConfirmarCancelacion = async ()=>{
+    const turno = turnoAConfirmar;
+    setTurnoAConfirmar(null);
+
+    if (!onCancelarTurno) return;
+
+    setModalFeedback({
+      status: 'Cargando',
+      message: 'Cancelando el turno...',
+    });
+
+    try {
+      await onCancelarTurno(turno);
+      setModalFeedback({
+        status: 'Ok',
+        message: 'Turno cancelado exitosamente.',
+      });
+    } catch (error) {
+      setModalFeedback({
+        status: 'Fallo',
+        message: error?.message || 'Error al cancelar el turno.',
+      });
+    }
+  }
+
   const obtenerClaseBadge = (estado) => {
     switch (estado?.toUpperCase()) {
       case 'PENDIENTE':
@@ -88,7 +130,7 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
                     type="button"
                     className="btn-cancelar"
                     disabled={deshabilitarBoton}
-                    onClick={() => handleCancelar(turno)}
+                    onClick={() => handleClickCancelar(turno)}
                   >
                     {yaCancelado ? 'Cancelado' : 'Cancelar'}
                   </button>
@@ -98,6 +140,18 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
           })}
         </tbody>
       </table>
+      <ConfirmarCancelacionModal 
+        isOpen={Boolean(turnoAConfirmar)}
+        turno={turnoAConfirmar}
+        onConfirmar={handleConfirmarCancelacion}
+        onCancelar={handleCerrarConfirmacion}
+      />
+
+      <Modal
+        status={modalFeedback.status}
+        message={modalFeedback.message}
+        onClose={() => setModalFeedback({ status: null, message: '' })}
+      />
     </div>
   );
 }

@@ -4,6 +4,9 @@ import TurnoTable from './TablaTurnos';
 export default function TurnoMedico({token, dni, onCancel}) {
 const [turnos, setTurnos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const handleCancelarTurno = async ()=>{
+    
+  }
   useEffect(() => {
     let montado = true;
 
@@ -33,7 +36,7 @@ const [turnos, setTurnos] = useState([]);
   return (
     <div>
       <h2>Turnos del médico</h2>
-      <TurnoTable turnos={turnos} />
+      <TurnoTable turnos={turnos} onCancel={onCancel}/>
     </div>
   );
 }       
