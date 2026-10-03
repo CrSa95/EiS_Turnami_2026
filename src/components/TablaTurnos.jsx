@@ -24,7 +24,7 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
     setTurnoAConfirmar(null);
 
     if (!onCancelarTurno) return;
-    
+
     setModalFeedback({
       status: 'Cargando',
       message: 'Cancelando el turno...',
@@ -105,9 +105,6 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
 
                 <td data-label="Motivo" className="td-motivo">
                   <span className="motivo-principal">{turno.motivo}</span>
-                  {turno.descripcion && turno.descripcion !== turno.motivo && (
-                    <span className="descripcion-secundaria">{turno.descripcion}</span>
-                  )}
                 </td>
 
                 <td data-label="Fecha y Hora" className="td-fecha">
