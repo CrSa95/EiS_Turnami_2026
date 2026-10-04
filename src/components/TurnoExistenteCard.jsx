@@ -165,14 +165,14 @@ function TurnoExistenteCard({
           Cancelar turno
         </button>
 
-        <button
+        {false && <button
           type="button"
           onClick={onVolver}
           className="btn-secondary"
           disabled={cargando}
         >
           Volver al inicio
-        </button>
+        </button>}
       </div>
 
       {/* Modal de confirmación */}
