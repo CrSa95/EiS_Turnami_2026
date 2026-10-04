@@ -269,14 +269,14 @@ function TurnoPaciente({ token, dni, onCancel }) {
                   {cargando ? "Enviando..." : "Enviar"}
                 </button>
 
-                <button
+               {false && <button
                   type="button"
                   onClick={onCancel}
                   className="btn-secondary"
                   disabled={cargando}
                 >
                   Cancelar
-                </button>
+                </button>}
               </div>
             </form>
           </div>
