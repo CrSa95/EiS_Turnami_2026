@@ -46,15 +46,12 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
 
   const obtenerClaseBadge = (estado) => {
     switch (estado?.toUpperCase()) {
-      case 'PENDIENTE':
-        return 'turno-badge badge-pendiente';
-      case 'CONFIRMADO':
-      case 'ATENDIDO':
-        return 'turno-badge badge-confirmado';
-      case 'CANCELADO':
-        return 'turno-badge badge-cancelado';
+      case "PENDIENTE":
+        return "turno-badge badge-pendiente";
+      case "CANCELADO":
+        return "turno-badge badge-cancelado";
       default:
-        return 'turno-badge badge-default';
+        return "turno-badge badge-pendiente";
     }
   };
 
@@ -118,7 +115,7 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
 
                 <td data-label="Estado" className="td-estado">
                   <span className={obtenerClaseBadge(turno.estado)}>
-                    {turno.estado || 'SIN ESTADO'}
+                    {yaCancelado ? "Cancelado" : "Pendiente"}
                   </span>
                 </td>
 
