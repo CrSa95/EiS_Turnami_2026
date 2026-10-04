@@ -62,7 +62,7 @@ function HomePage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [rejectRecipeId, setRejectRecipeId] = useState(null);
   const [rejectDocumentType, setRejectDocumentType] = useState("Receta");
-  
+
   const [showProximosModal, setShowProximosModal] = useState(false);
 
   useEffect(() => {
@@ -133,7 +133,7 @@ function HomePage() {
         receta: {
           nombre: image.idReceta || image.idImagen,
           fecha: formatRecipeDate(image.fechaCarga || image.createdAt),
-          estado: image.estado, 
+          estado: image.estado,
         },
         image,
       }));
@@ -226,24 +226,20 @@ function HomePage() {
 
   const handleRejectSuccess = (idReceta) => {
     const setItems = rejectDocumentType === "Orden" ? setOrdenes : setRecetas;
-    setItems((prev) =>
-      prev.filter((item) => item.receta.nombre !== idReceta),
-    );
+    setItems((prev) => prev.filter((item) => item.receta.nombre !== idReceta));
 
     setState({
       type: States.Ok,
       message: "La receta ha sido rechazada correctamente.",
     });
   };
-  
+
   const onCancelTurno = () => {
-    if(session.role === "patient"){
-          setTab(tabs[0].key);
+    if (session.role === "patient") {
+      setTab(tabs[0].key);
     }
-    setTab(tabs[2].key)
-  }
-
-
+    setTab(tabs[2].key);
+  };
 
   const subtitle =
     role == "paciente"
@@ -257,10 +253,10 @@ function HomePage() {
         handleLogout={handleLogout}
       />
 
-      {role === "paciente" && (
+      {false && role === "paciente" && (
         <>
-          <button 
-            className="btn-proximos-turnos" 
+          <button
+            className="btn-proximos-turnos"
             onClick={() => setShowProximosModal(true)}
           >
             Próximos turnos
@@ -269,8 +265,8 @@ function HomePage() {
           {showProximosModal && (
             <div className="modal-overlay">
               <div className="modal-content">
-                <button 
-                  className="modal-close" 
+                <button
+                  className="modal-close"
                   onClick={() => setShowProximosModal(false)}
                 >
                   ✖
@@ -281,7 +277,6 @@ function HomePage() {
           )}
         </>
       )}
-
 
       <div>
         <TabView tab={tab} tabs={tabs} setTab={setTab} />
@@ -316,7 +311,7 @@ function HomePage() {
             dni={session.user?.dni || session.dni}
             onCancel={onCancelTurno}
           />
-        ) }  
+        )}
       </div>
 
       <ModalReject
@@ -329,7 +324,6 @@ function HomePage() {
       />
 
       <ModalState state={state} setState={setState} />
-
     </main>
   );
 }
