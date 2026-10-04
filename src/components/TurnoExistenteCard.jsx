@@ -34,11 +34,9 @@ function TurnoExistenteCard({
   const medicoNombre =
     turno.medicoNombre || medicoNombreProp || "Médico de cabecera";
 
-  const fechaRaw =
-    turno.fechaPreferencia || turno.fecha;
+  const fechaRaw = turno.fechaPreferencia || turno.fecha;
 
-  const hora =
-    turno.horaPreferencia || turno.hora;
+  const hora = turno.horaPreferencia || turno.hora;
 
   const fechaFormateada = formatearFechaTexto(fechaRaw);
 
@@ -140,8 +138,8 @@ function TurnoExistenteCard({
       <h2>Mis turnos</h2>
 
       <p className="mensaje-confirmacion">
-        Se solicitó un turno con {medicoNombre} para el día{" "}
-        {fechaFormateada} a las {hora} hs.
+        Se solicitó un turno con {medicoNombre} para el día {fechaFormateada} a
+        las {hora} hs.
       </p>
 
       <div
@@ -165,100 +163,88 @@ function TurnoExistenteCard({
           Cancelar turno
         </button>
 
-        {false && <button
-          type="button"
-          onClick={onVolver}
-          className="btn-secondary"
-          disabled={cargando}
-        >
-          Volver al inicio
-        </button>}
+        {false && (
+          <button
+            type="button"
+            onClick={onVolver}
+            className="btn-secondary"
+            disabled={cargando}
+          >
+            Volver al inicio
+          </button>
+        )}
       </div>
 
       {/* Modal de confirmación */}
 
-      {modalState.visible &&
-        modalState.type === "confirmacion" && (
-          <div
-            className="status-modal-backdrop"
-            role="presentation"
+      {modalState.visible && modalState.type === "confirmacion" && (
+        <div className="status-modal-backdrop" role="presentation">
+          <section
+            className="status-modal status-modal-fallo"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-confirmacion"
+            aria-describedby="texto-confirmacion"
           >
-            <section
-              className="status-modal status-modal-fallo"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="titulo-confirmacion"
-              aria-describedby="texto-confirmacion"
+            <div className="status-modal-symbol" aria-hidden="true">
+              ?
+            </div>
+
+            <h2 id="titulo-confirmacion">Confirmar cancelación</h2>
+
+            <p id="texto-confirmacion">{modalState.message}</p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                justifyContent: "center",
+                marginTop: "15px",
+              }}
             >
-              <div
-                className="status-modal-symbol"
-                aria-hidden="true"
-              >
-                ?
-              </div>
-
-              <h2 id="titulo-confirmacion">
-                Confirmar cancelación
-              </h2>
-
-              <p id="texto-confirmacion">
-                {modalState.message}
-              </p>
-
-              <div
+              <button
+                type="button"
+                onClick={ejecutarCancelacion}
+                className="btn-primary"
+                disabled={cargando}
                 style={{
-                  display: "flex",
-                  gap: "10px",
-                  justifyContent: "center",
-                  marginTop: "15px",
+                  backgroundColor: "#dc3545",
+                  borderColor: "#dc3545",
                 }}
               >
-                <button
-                  type="button"
-                  onClick={ejecutarCancelacion}
-                  className="btn-primary"
-                  disabled={cargando}
-                  style={{
-                    backgroundColor: "#dc3545",
-                    borderColor: "#dc3545",
-                  }}
-                >
-                  Sí, cancelar
-                </button>
+                Sí, cancelar
+              </button>
 
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="btn-secondary"
-                  disabled={cargando}
-                >
-                  Mantener turno
-                </button>
-              </div>
-            </section>
-          </div>
-        )}
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="btn-secondary"
+                disabled={cargando}
+              >
+                Mantener turno
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* Modales de carga, éxito, error y plazo vencido */}
 
-      {modalState.visible &&
-        modalState.type !== "confirmacion" && (
-          <Modal
-            status={
-              modalState.type === "cargando"
-                ? "Cargando"
-                : modalState.type === "exito"
-                  ? "Ok"
-                  : "Fallo"
-            }
-            message={modalState.message}
-            onClose={
-              modalState.type !== "cargando"
-                ? handleCloseModal
-                : undefined
-            }
-          />
-        )}
+      {modalState.visible && modalState.type !== "confirmacion" && (
+        <Modal
+          status={
+            modalState.type === "cargando"
+              ? "Cargando"
+              : modalState.type === "exito"
+                ? "Ok"
+                : "Fallo"
+          }
+          message={modalState.message}
+          onClose={
+            modalState.type !== "cargando" ? handleCloseModal : undefined
+          }
+        />
+      )}
     </div>
   );
 }
