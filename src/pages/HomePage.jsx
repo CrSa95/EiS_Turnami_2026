@@ -237,8 +237,9 @@ function HomePage() {
   const onCancelTurno = () => {
     if (session.role === "patient") {
       setTab(tabs[0].key);
+    }else{
+      setTab(tabs[2].key);
     }
-    setTab(tabs[2].key);
   };
 
   const subtitle =
