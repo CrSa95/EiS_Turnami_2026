@@ -193,7 +193,6 @@ function HomePage() {
 
   const handleTranscribeRecipe = async (idReceta, type = "Receta") => {
     if (!idReceta) return;
-
     setState(States.Loading);
 
     try {
