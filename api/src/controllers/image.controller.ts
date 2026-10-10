@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import ImageDAO from '../dao/image.dao.js';
 import PacienteDAO from '../dao/paciente.dao.js';
 import ImageService from '../services/image.service.js';
+import { NotificationDeliveryError } from '../services/email.service.js';
 
 export default class ImageController {
     private imageDAO: ImageDAO;
@@ -164,13 +165,22 @@ export default class ImageController {
     public rejectImage = async (req: Request, res: Response): Promise<void> => {
         try {
             const { idImagen } = req.params;
+            const motivo = typeof req.body?.motivo === 'string' ? req.body.motivo.trim() : '';
 
             if (!idImagen || typeof idImagen !== 'string' || !idImagen.trim()) {
                 res.status(400).json({ message: 'El ID de la receta u orden es requerido' });
                 return;
             }
 
-           const updatedImage = await this.imageService.rejectImage(idImagen.trim());
+            if (motivo.length > 200) {
+                res.status(400).json({ message: 'El motivo no puede superar los 200 caracteres' });
+                return;
+            }
+
+           const updatedImage = await this.imageService.rejectImage(
+                idImagen.trim(),
+                motivo || 'No se especificó un motivo.'
+            );
 
             if (!updatedImage) {
                 res.status(404).json({ message: 'No se encontró la receta u orden solicitada' });
@@ -182,9 +192,13 @@ export default class ImageController {
                 image: updatedImage
             });
         } catch (error) {
+            if (error instanceof NotificationDeliveryError) {
+                res.status(502).json({ message: error.message });
+                return;
+            }
+
             res.status(500).json({
                 message: 'Error al rechazar la receta u orden',
-                error
             });
         }
     };

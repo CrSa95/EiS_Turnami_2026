@@ -230,7 +230,11 @@ function HomePage() {
 
     setState({
       type: States.Ok,
-      message: "La receta ha sido rechazada correctamente.",
+      message:
+        rejectDocumentType === "Orden"
+          ? "Se envió la notificación correspondiente vía mail al paciente."
+          : `${rejectDocumentType} ha sido rechazada correctamente.`,
+      persistent: rejectDocumentType === "Orden",
     });
   };
 
@@ -318,6 +322,7 @@ function HomePage() {
       <ModalReject
         isOpen={Boolean(rejectRecipeId)}
         recipeId={rejectRecipeId}
+        documentType={rejectDocumentType}
         token={session.access_token}
         onClose={() => setRejectRecipeId(null)}
         onSuccess={handleRejectSuccess}

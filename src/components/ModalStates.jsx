@@ -8,13 +8,14 @@ function ModalState({ state, setState }) {
   // Extraer tipo y mensaje dinámico si state es un objeto
   const currentType = typeof state === "object" ? state?.type : state;
   const customMessage = typeof state === "object" ? state?.message : null;
+  const persistent = typeof state === "object" && state?.persistent;
 
   useEffect(() => {
-    if (currentType !== States.Ok && currentType !== States.Error) return;
+    if (persistent || (currentType !== States.Ok && currentType !== States.Error)) return;
 
     const timeoutId = setTimeout(() => setState("NONE"), 10000); // acá es para settear los segs
     return () => clearTimeout(timeoutId);
-  }, [currentType, setState]);
+  }, [currentType, persistent, setState]);
 
   return (
     <>
