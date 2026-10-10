@@ -7,8 +7,4 @@ export default class PacienteDAO {
     async findByMedicoDni(medicoDni: string): Promise<IPaciente[]> {
         return await PacienteModel.find({ medicoDni }).exec();
     }
-
-    async findByRecetaId(recetaId: string): Promise<IPaciente[]> {
-        return await 
-    }
 }

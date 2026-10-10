@@ -47,11 +47,13 @@ export default class EmailService {
     }
 
     public async sendTranscribedRecipeAccept(receta: IImage){
-        const Paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
+        const paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
+        const nombrePaciente = paciente?.nombre || 'Paciente';
+        const safePaciente = escapeHtml(nombrePaciente);
         return await this.sendBrandedEmail({
             subject: "Receta Transcripta",
             text: [
-                `Estimado/a ${Paciente?.nombre}`,
+                `Estimado/a ${nombrePaciente}`,
                 "Le informamos que su receta del medicamento fue transcripta con éxito.",
                 "Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI",
                 "Saludos cordiales,",
