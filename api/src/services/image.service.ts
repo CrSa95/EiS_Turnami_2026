@@ -15,9 +15,18 @@ export default class ImageService {
         if(updatedImage === null){
             throw new Error("No existe la receta a transcribir")
         }
-        this.emailService.sendTranscribedRecipeAccept(
-            updatedImage
-        )
+
+        if(updatedImage.tipo === "Orden"){
+            await this.emailService.sendTranscribedOrder(updatedImage)
+            return updatedImage;
+        }
+
+        if(updatedImage.tipo === "Receta"){
+            await this.emailService.sendTranscribedRecipeAccept(updatedImage)
+            return updatedImage;
+        }
+
+        
         return updatedImage;
     }
 

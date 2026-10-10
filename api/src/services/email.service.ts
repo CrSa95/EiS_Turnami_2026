@@ -67,6 +67,28 @@ export default class EmailService {
         })
     }
 
+    public async sendTranscribedOrder(orden: IImage): Promise<void> {
+        const paciente = await this.pacienteDAO.findByDNI(orden.pacienteDni);
+        const nombrePaciente = paciente?.nombre || 'Paciente';
+        const safePaciente = escapeHtml(nombrePaciente);
+
+        return await this.sendBrandedEmail({
+            subject: 'Orden Transcripta',
+            text: [
+                `Estimado/a ${nombrePaciente}:`,
+                'Le informamos que su orden médica fue transcripta con éxito.',
+                'Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.',
+                'Saludos cordiales,',
+                'Equipo de Turnami.'
+            ].join('\n\n'),
+            content: `
+                <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su orden médica fue transcripta con éxito.</p>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+        });
+    }
+
     public async getOrderRejectionNames(pacienteDni: string): Promise<{
         nombrePaciente: string;
         nombreMedico: string;
