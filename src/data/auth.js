@@ -51,6 +51,16 @@ async function request(role, options = {}) {
 }
 
 async function requestEndpoint(endpoint, options = {}) {
+  if (
+    typeof options.body === "string" &&
+    !new Headers(options.headers).has("Content-Type")
+  ) {
+    options = {
+      ...options,
+      headers: { ...options.headers, "Content-Type": "application/json" },
+    };
+  }
+
   const response = await fetch(endpoint, options);
   const payload = await response.json().catch(() => ({}));
 
@@ -147,10 +157,11 @@ export function transcribeRecipe(accessToken, idReceta) {
   });
 }
 
-export function rejectRecipe(accessToken, idReceta) {
+export function rejectRecipe(accessToken, idReceta, motivo) {
   return requestEndpoint(endpoints.rejectRecipe(idReceta), {
     method: "PATCH",
     headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ motivo }),
   });
 }
 

@@ -8,6 +8,7 @@ const DEFAULT_MOTIVO =
 function ModalReject({
   isOpen,
   recipeId,
+  documentType = "Receta",
   token,
   onClose,
   onSuccess,
@@ -54,7 +55,11 @@ function ModalReject({
           onClose();
         } catch (error) {
           setLoading(false);
-          setErrorMessage("No se pudo rechazar la receta. Intente nuevamente.");
+          setErrorMessage(
+            error instanceof TypeError
+              ? "No se pudo conectar con el servidor. Intentá nuevamente en unos momentos."
+              : error.message || "No se pudo completar el rechazo. Intente nuevamente.",
+          );
         }
       };
     
@@ -68,16 +73,45 @@ function ModalReject({
       }
     
       if (errorMessage) {
+        const isOrderNotification = documentType === "Orden";
+
         return (
-          <Modal status="Fallo" message={errorMessage} onClose={handleCloseError} />
+          <div className="status-modal-backdrop" role="presentation">
+            <section
+              className="status-modal status-modal-fallo"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reject-error-title"
+            >
+              <div className="status-modal-symbol" aria-hidden="true">!</div>
+              <h2 id="reject-error-title">
+                {isOrderNotification ? "Ocurrió un error" : `No se pudo rechazar ${documentType.toLowerCase()}`}
+              </h2>
+              <p role="alert">
+                {isOrderNotification
+                  ? "No se pudo enviar la notificación correspondiente vía mail al paciente, por favor reintente."
+                  : errorMessage}
+              </p>
+              <button type="button" onClick={handleConfirm}>Reintentar</button>
+              {!isOrderNotification && (
+                <button
+                  type="button"
+                  onClick={handleCloseError}
+                  style={{ marginLeft: "10px", background: "#5e6b7d" }}
+                >
+                  Cerrar
+                </button>
+              )}
+            </section>
+          </div>
         );
       }
 
   return (
     <div className="status-modal-backdrop">
       <div className="status-modal">
-        <h2>Rechazar Receta</h2>
-        <p>Ingrese el motivo por el cual rechaza la receta:</p>
+        <h2>Rechazar {documentType}</h2>
+        <p>Ingrese el motivo por el cual rechaza {documentType.toLowerCase()}:</p>
 
         <textarea
           value={motivo}

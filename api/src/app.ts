@@ -11,7 +11,9 @@ import jwt from 'jsonwebtoken';
 // Importamos el DAO y Controlador de imágenes para mantener la arquitectura de capas
 import ImageDAO from './dao/image.dao.js';
 import PacienteDAO from './dao/paciente.dao.js';
+import MedicoDAO from './dao/medico.dao.js';
 import ImageService from './services/image.service.js';
+import EmailService from './services/email.service.js';
 import ImageController from './controllers/image.controller.js';
 
 import TurnoDAO from './dao/turno.dao.js';
@@ -23,7 +25,11 @@ const app: Application = express();
 // Instanciamos el DAO y el Controlador de imágenes
 const imageDAO = new ImageDAO();
 const pacienteDAO = new PacienteDAO(); // Inyectamos el DAO de Paciente
-const imageService = new ImageService(imageDAO);
+const medicoDAO = new MedicoDAO();
+const imageService = new ImageService(
+  imageDAO,
+  new EmailService(pacienteDAO, medicoDAO),
+);
 const imageController = new ImageController(imageDAO, pacienteDAO, imageService);
 
 const turnoDAO = new TurnoDAO();

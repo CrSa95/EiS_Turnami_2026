@@ -6,6 +6,10 @@ export default class ImageDAO {
         return await newImage.save();
     }
 
+    async findByIdImagen(idImagen: string): Promise<IImage | null> {
+        return await ImageModel.findOne({ idImagen }).exec();
+    }
+
     // Buscar imágenes de un paciente por su DNI, tipo de receta u orden y su estado
     async findByPacienteDni(pacienteDni: string,estado?: string, tipo?: string): Promise<IImage[]> {
         const query: any = { pacienteDni };
@@ -38,5 +42,21 @@ export default class ImageDAO {
         } catch (error) {
             throw error;
         }
+    }
+
+    async rejectPending(idImagen: string): Promise<IImage | null> {
+        return await ImageModel.findOneAndUpdate(
+            { idImagen, estado: 'Pendiente' },
+            { estado: 'Rechazada' },
+            { new: true }
+        ).exec();
+    }
+
+    async restorePending(idImagen: string): Promise<IImage | null> {
+        return await ImageModel.findOneAndUpdate(
+            { idImagen, estado: 'Rechazada' },
+            { estado: 'Pendiente' },
+            { new: true }
+        ).exec();
     }
 }
