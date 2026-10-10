@@ -12,6 +12,12 @@ export default class ImageService {
 
     public async transcribeImage(idImagen: string) {
         const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Transcripta');
+        if(updatedImage === null){
+            throw new Error("No existe la receta a transcribir")
+        }
+        this.emailService.sendTranscribedRecipeAccept(
+            updatedImage
+        )
         return updatedImage;
     }
 
