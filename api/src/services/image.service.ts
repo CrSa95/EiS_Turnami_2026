@@ -12,6 +12,32 @@ export default class ImageService {
 
     public async transcribeImage(idImagen: string) {
         const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Transcripta');
+
+
+        if(updatedImage === null){
+            throw new Error("No existe la receta a transcribir")
+        }
+        try{
+            if(updatedImage.tipo === "Orden"){
+                await this.emailService.sendTranscribedOrder(updatedImage)
+                return updatedImage;
+            }
+
+            if(updatedImage.tipo === "Receta"){
+                await this.emailService.sendTranscribedRecipeAccept(updatedImage)
+                return updatedImage;
+            }
+
+        }catch(error ){
+            const updatedImage = await this.imageDAO.updateStatus(idImagen, 'Pendiente');
+            if (!updatedImage) {
+                throw new Error('La orden ya no pudo restaurarse al estado pendiente.');
+            }
+
+            throw error;
+        }
+
+        
         return updatedImage;
     }
 

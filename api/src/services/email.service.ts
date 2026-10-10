@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { readFileSync } from 'node:fs';
 import PacienteDAO from '../dao/paciente.dao.js';
 import MedicoDAO from '../dao/medico.dao.js';
+import { IImage } from '../model/image.model.js';
 
 export class NotificationDeliveryError extends Error {
     constructor(message: string) {
@@ -43,6 +44,49 @@ export default class EmailService {
     constructor(pacienteDAO?: PacienteDAO, medicoDAO?: MedicoDAO) {
         this.pacienteDAO = pacienteDAO || new PacienteDAO();
         this.medicoDAO = medicoDAO || new MedicoDAO();
+    }
+
+    public async sendTranscribedRecipeAccept(receta: IImage){
+        const paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
+        const nombrePaciente = paciente?.nombre || 'Paciente';
+        const safePaciente = escapeHtml(nombrePaciente);
+        return await this.sendBrandedEmail({
+            subject: "Receta Transcripta",
+            text: [
+                `Estimado/a ${nombrePaciente}`,
+                "Le informamos que su receta del medicamento fue transcripta con éxito.",
+                "Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI",
+                "Saludos cordiales,",
+                "Equipo de Turnami"
+            ].join('\n\n'),
+            content: `
+                <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su receta del medicamento fue transcripta con éxito.</p>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI.</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+        })
+    }
+
+    public async sendTranscribedOrder(orden: IImage): Promise<void> {
+        const paciente = await this.pacienteDAO.findByDNI(orden.pacienteDni);
+        const nombrePaciente = paciente?.nombre || 'Paciente';
+        const safePaciente = escapeHtml(nombrePaciente);
+
+        return await this.sendBrandedEmail({
+            subject: 'Orden Transcripta',
+            text: [
+                `Estimado/a ${nombrePaciente}:`,
+                'Le informamos que su orden médica fue transcripta con éxito.',
+                'Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.',
+                'Saludos cordiales,',
+                'Equipo de Turnami.'
+            ].join('\n\n'),
+            content: `
+                <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su orden médica fue transcripta con éxito.</p>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+        });
     }
 
     public async getOrderRejectionNames(pacienteDni: string): Promise<{

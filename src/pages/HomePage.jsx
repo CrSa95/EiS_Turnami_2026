@@ -193,7 +193,6 @@ function HomePage() {
 
   const handleTranscribeRecipe = async (idReceta, type = "Receta") => {
     if (!idReceta) return;
-
     setState(States.Loading);
 
     try {
@@ -206,13 +205,15 @@ function HomePage() {
 
       setState({
         type: States.Ok,
-        message: "La receta ha sido marcada como transcripta correctamente.",
+        title: "Operación completada",
+        message: "Se envió la notificación correspondiente vía mail al paciente.",
       });
     } catch (error) {
       setState({
         type: States.Error,
-        message:
-          "No se pudo marcar la receta como transcripta. Intente nuevamente.",
+        title: "Ocurrió un error",
+        message: "No se pudo enviar la notificación correspondiente vía mail al paciente, por favor reintente.",
+        onRetry: () => handleTranscribeRecipe(idReceta, type),
       });
     }
   };

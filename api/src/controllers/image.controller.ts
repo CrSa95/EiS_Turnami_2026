@@ -154,6 +154,10 @@ export default class ImageController {
                 image: updatedImage
             });
         } catch (error) {
+            if (error instanceof NotificationDeliveryError) {
+                res.status(502).json({ message: error.message });
+                return;
+            }
             res.status(500).json({
                 message: 'Error al marcar la receta u orden como transcripta',
                 error
