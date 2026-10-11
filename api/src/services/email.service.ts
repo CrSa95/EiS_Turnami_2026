@@ -50,6 +50,8 @@ export default class EmailService {
     public async sendTranscribedRecipeAccept(receta: IImage){
         const paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
+        const recetaId = paciente?._id?.toString() || 'Receta';
+        const safeRecetaId = escapeHtml(recetaId)
         const safePaciente = escapeHtml(nombrePaciente);
         return await this.sendBrandedEmail({
             subject: "Receta Transcripta",
@@ -58,20 +60,25 @@ export default class EmailService {
                 "Le informamos que su receta del medicamento fue transcripta con éxito.",
                 "Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI",
                 "Saludos cordiales,",
-                "Equipo de Turnami"
+                "Equipo de Turnami",
+                `Referencia de Orden: ${recetaId}`
             ].join('\n\n'),
             content: `
                 <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su receta del medicamento fue transcripta con éxito.</p>
                 <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI.</p>
-                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>
+                <p style="margin:0;font-size:14px;color:#64748b;">Referencia de Receta: <strong style="color:#14264b;">${safeRecetaId}</strong></p>
+                `
         })
     }
 
     public async sendTranscribedOrder(orden: IImage): Promise<void> {
         const paciente = await this.pacienteDAO.findByDNI(orden.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
+        const ordenId = paciente?._id?.toString() || 'Orden';
         const safePaciente = escapeHtml(nombrePaciente);
+        const safeOrdenId = escapeHtml(ordenId)
 
         return await this.sendBrandedEmail({
             subject: 'Orden Transcripta',
@@ -80,13 +87,15 @@ export default class EmailService {
                 'Le informamos que su orden médica fue transcripta con éxito.',
                 'Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.',
                 'Saludos cordiales,',
-                'Equipo de Turnami.'
+                'Equipo de Turnami.',
+                `Referencia de Orden: ${ordenId}`
             ].join('\n\n'),
             content: `
                 <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su orden médica fue transcripta con éxito.</p>
                 <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Puede dirigirse a su centro hospitalario asignado para realizarse el estudio médico correspondiente.</p>
-                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>
+                <p style="margin:0;font-size:14px;color:#64748b;">Referencia de Orden: <strong style="color:#14264b;">${safeOrdenId}</strong></p>`
         });
     }
 
