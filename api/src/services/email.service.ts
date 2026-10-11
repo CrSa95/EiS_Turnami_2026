@@ -50,7 +50,7 @@ export default class EmailService {
     public async sendTranscribedRecipeAccept(receta: IImage){
         const paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
-        const recetaId = paciente?._id?.toString() || 'Receta';
+        const recetaId = paciente?.idImagen?.toString() || 'Receta';
         const safeRecetaId = escapeHtml(recetaId)
         const safePaciente = escapeHtml(nombrePaciente);
         return await this.sendBrandedEmail({
@@ -76,7 +76,7 @@ export default class EmailService {
     public async sendTranscribedOrder(orden: IImage): Promise<void> {
         const paciente = await this.pacienteDAO.findByDNI(orden.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
-        const ordenId = paciente?._id?.toString() || 'Orden';
+        const ordenId = paciente?.idImagen?.toString() || 'Orden';
         const safePaciente = escapeHtml(nombrePaciente);
         const safeOrdenId = escapeHtml(ordenId)
 
