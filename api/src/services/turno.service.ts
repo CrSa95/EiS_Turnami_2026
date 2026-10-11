@@ -2,12 +2,15 @@ import TurnoDAO from '../dao/turno.dao.js';
 import { EstadoTurno } from '../model/turno.model.js';
 import Paciente from '../model/paciente.model.js';
 import Medico from '../model/medico.model.js';
+import EmailService, { NotificationDeliveryError } from './email.service.js';
 
 export class TurnoService {
   private turnoDAO: TurnoDAO;
+  private emailService: EmailService;
 
-  constructor(turnoDAO: TurnoDAO) {
+  constructor(turnoDAO: TurnoDAO, emailService: EmailService = new EmailService()) {
     this.turnoDAO = turnoDAO;
+    this.emailService = emailService;
   }
 
   
@@ -164,16 +167,64 @@ export class TurnoService {
     };
   }
 
-  async proximosTurnosMedico(medicoDNI: String){
+  async proximosTurnosMedico(medicoDNI: string){
     const turnos = await this.turnoDAO.turnosDelMedico(medicoDNI)
 
     return turnos
   }
 
-  async cancelarTurnoDelPaciente(medicoDNI: String, turnoId: String){
-    const resultado = await this.turnoDAO.cancelarTurnoDelPaciente(medicoDNI, turnoId)
+  async cancelarTurnoDelPaciente(medicoDNI: string, turnoId: string) {
+    const turno = await this.turnoDAO.obtenerTurnoPorId(turnoId);
+    if (!turno) {
+      throw new Error('El turno solicitado no existe.');
+    }
+    if (turno.medicoDni !== medicoDNI) {
+      throw new Error('No tiene permisos para cancelar este turno.');
+    }
+    if (![EstadoTurno.PENDIENTE, EstadoTurno.CONFIRMADO].includes(turno.estado)) {
+      throw new Error('El turno ya se encuentra inactivo.');
+    }
 
-    return resultado;
+    const turnoCancelado = await this.turnoDAO.cancelarTurnoDelPaciente(medicoDNI, turnoId);
+    if (!turnoCancelado) {
+      throw new Error('El turno ya no se encuentra disponible para cancelar.');
+    }
+
+    try {
+      const { nombrePaciente, nombreMedico } =
+        await this.emailService.getPatientAndDoctorNames(turno.pacienteDni);
+      await this.emailService.sendDoctorCancelledAppointmentNotification(
+        nombrePaciente,
+        nombreMedico,
+      );
+    } catch (error) {
+      try {
+        const turnoRestaurado = await this.turnoDAO.restaurarEstadoTurno(
+          turnoId,
+          turno.estado,
+        );
+        if (!turnoRestaurado) {
+          throw new Error('No se pudo restaurar el estado anterior del turno.');
+        }
+      } catch (rollbackError) {
+        console.error('No se pudo restaurar el turno tras fallar la notificación:', rollbackError);
+        throw new Error(
+          'Falló el envío de la notificación y no se pudo restaurar el estado del turno.',
+          { cause: rollbackError },
+        );
+      }
+
+      throw error instanceof NotificationDeliveryError
+        ? error
+        : new NotificationDeliveryError(
+            'No se pudo enviar el correo de notificación. El turno continúa en su estado anterior.',
+          );
+    }
+
+    return {
+      mensaje: 'El turno fue cancelado y se envió la notificación al paciente.',
+      turno: turnoCancelado,
+    };
   }
 }
 

@@ -27,7 +27,7 @@ function Modal({ status, title, message, children, onClose, onRetry }) {
                 <h2 id="status-modal-title">{displayTitle}</h2>
                 {(message || children) && <p>{children || message}</p>}
                 
-                <div className="status-modal-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '16px' }}>
+                <div className="status-modal-actions">
                     {onRetry && (
                         <button type="button" className="btn-retry" onClick={onRetry}>
                             Reintentar
@@ -35,7 +35,7 @@ function Modal({ status, title, message, children, onClose, onRetry }) {
                     )}
                     {onClose && status !== 'Cargando' && (
                         <button type="button" className="btn-close" onClick={onClose}>
-                            {onRetry ? 'Cerrar' : 'Cerrar'}
+                            Cerrar
                         </button>
                     )}
                 </div>

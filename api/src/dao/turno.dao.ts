@@ -4,7 +4,6 @@ import {
     ITurno,
     ITurnoConPaciente,
 } from "../model/turno.model.js";
-import {Types} from "mongoose"
 export class TurnoDAO {
     async buscarTurnosPorEstado(
         pacienteDni: string,
@@ -89,15 +88,24 @@ export class TurnoDAO {
         ]);
     }
 
-    async cancelarTurnoDelPaciente(idMedico: string, idTurno: string): Promise<ITurno | null>{
-        return await TurnoModel.findByIdAndUpdate(
+    async cancelarTurnoDelPaciente(idMedico: string, idTurno: string): Promise<ITurno | null> {
+        return await TurnoModel.findOneAndUpdate(
             {
-                _id: new Types.ObjectId(idTurno),
-                medicoDni: new Types.ObjectId(idMedico),
+                _id: idTurno,
+                medicoDni: idMedico,
+                estado: { $in: [EstadoTurno.PENDIENTE, EstadoTurno.CONFIRMADO] },
             },
             { estado: EstadoTurno.CANCELADO },
             { new: true },
-        );
+        ).exec();
+    }
+
+    async restaurarEstadoTurno(idTurno: string, estado: EstadoTurno): Promise<ITurno | null> {
+        return await TurnoModel.findOneAndUpdate(
+            { _id: idTurno, estado: EstadoTurno.CANCELADO },
+            { estado },
+            { new: true },
+        ).exec();
     }
 }
 export default TurnoDAO;

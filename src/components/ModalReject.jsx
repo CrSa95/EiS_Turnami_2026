@@ -73,37 +73,14 @@ function ModalReject({
       }
     
       if (errorMessage) {
-        const isOrderNotification = documentType === "Orden";
-
         return (
-          <div className="status-modal-backdrop" role="presentation">
-            <section
-              className="status-modal status-modal-fallo"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="reject-error-title"
-            >
-              <div className="status-modal-symbol" aria-hidden="true">!</div>
-              <h2 id="reject-error-title">
-                {isOrderNotification ? "Ocurrió un error" : `No se pudo rechazar ${documentType.toLowerCase()}`}
-              </h2>
-              <p role="alert">
-                {isOrderNotification
-                  ? "No se pudo enviar la notificación correspondiente vía mail al paciente, por favor reintente."
-                  : errorMessage}
-              </p>
-              <button type="button" onClick={handleConfirm}>Reintentar</button>
-              {!isOrderNotification && (
-                <button
-                  type="button"
-                  onClick={handleCloseError}
-                  style={{ marginLeft: "10px", background: "#5e6b7d" }}
-                >
-                  Cerrar
-                </button>
-              )}
-            </section>
-          </div>
+          <Modal
+            status="Fallo"
+            title="Ocurrió un error"
+            message="No se pudo enviar la notificación correspondiente vía mail al paciente, por favor reintente."
+            onRetry={handleConfirm}
+            onClose={handleCloseError}
+          />
         );
       }
 

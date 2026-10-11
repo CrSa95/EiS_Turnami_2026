@@ -33,7 +33,7 @@ const imageService = new ImageService(
 const imageController = new ImageController(imageDAO, pacienteDAO, imageService);
 
 const turnoDAO = new TurnoDAO();
-const turnoService = new TurnoService(turnoDAO);
+const turnoService = new TurnoService(turnoDAO, new EmailService(pacienteDAO, medicoDAO));
 const turnoController = new TurnoController(turnoService);
 
 app.use(cors());
@@ -209,6 +209,10 @@ app.get(
   turnoController.turnosDelMedico
 )
 
-app.put("/api/v1/medico/turnos/:id/cancelar", turnoController.cancelarTurnoDelPaciente)
+app.put(
+  "/api/v1/medico/turnos/:id/cancelar",
+  verificarTokenMedico,
+  turnoController.cancelarTurnoDelPaciente,
+)
 
 export default app;

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import TurnoService from '../services/turno.service.js';
+import { NotificationDeliveryError } from '../services/email.service.js';
 
 export class TurnoController {
   private turnoService: TurnoService;
@@ -97,12 +98,23 @@ export class TurnoController {
     try{
       const medicoDni = (req as any).user?.dni;
       const {id} = req.params;
-      const resultado = await this.turnoService.cancelarTurnoDelPaciente(medicoDni, id)
+      if (!medicoDni || typeof id !== 'string' || !id.trim()) {
+        res.status(400).json({ message: 'Identificador de turno no válido.' });
+        return;
+      }
+      const resultado = await this.turnoService.cancelarTurnoDelPaciente(medicoDni, id.trim())
 
       res.status(200).json(resultado)
     }catch(error){
+      if (error instanceof NotificationDeliveryError) {
+        res.status(502).json({
+          code: 'NOTIFICATION_DELIVERY_FAILED',
+          message: error.message,
+        });
+        return;
+      }
       const message = error instanceof Error ? error.message : "Error al cancelar turno del paciente";
-      res.status(500).json({ message });
+      res.status(400).json({ message });
     }
   }
 }

@@ -65,12 +65,14 @@ async function requestEndpoint(endpoint, options = {}) {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(
+    const error = new Error(
       payload.mensaje ||
       payload.message ||
       payload.error ||
       "No fue posible completar la solicitud. Intentá nuevamente.",
     );
+    error.code = payload.code;
+    throw error;
   }
 
   return payload;

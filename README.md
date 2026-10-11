@@ -13,9 +13,6 @@ NOTIFICATION_RECIPIENT_EMAIL=tu-correo@ejemplo.com
 utilizá `onboarding@resend.dev` como remitente. En el plan gratuito/modo de
 prueba, Resend limita el envío a la dirección de correo verificada de tu propia
 cuenta; configurá esa misma dirección en `NOTIFICATION_RECIPIENT_EMAIL`.
-Para enviar a otros destinatarios, Resend requiere verificar un dominio.
-Si Resend falla al notificar el rechazo de una orden, esta vuelve a quedar
-pendiente y el médico puede reintentar desde el modal.
 
 Los correos se envían con una plantilla HTML común de Turnami (logo y colores
 institucionales). Para reutilizarla en nuevas notificaciones, usar

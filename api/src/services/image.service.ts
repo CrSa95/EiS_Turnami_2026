@@ -45,18 +45,15 @@ export default class ImageService {
         const image = await this.imageDAO.findByIdImagen(idImagen);
         if (!image) return null;
 
-        if (image.tipo !== 'Orden') {
-            return await this.imageDAO.updateStatus(idImagen, 'Rechazada');
-        }
-
         const rejectedImage = await this.imageDAO.rejectPending(idImagen);
         if (!rejectedImage) return null;
 
         try {
             const { nombrePaciente, nombreMedico } =
-                await this.emailService.getOrderRejectionNames(image.pacienteDni);
-            await this.emailService.sendOrderRejectedNotification({
+                await this.emailService.getPatientAndDoctorNames(image.pacienteDni);
+            await this.emailService.sendRejectionNotification({
                 idImagen,
+                tipo: image.tipo,
                 nombrePaciente,
                 nombreMedico,
                 motivo
@@ -65,7 +62,7 @@ export default class ImageService {
             try {
                 const restoredImage = await this.imageDAO.restorePending(idImagen);
                 if (!restoredImage) {
-                    throw new Error('La orden ya no pudo restaurarse al estado pendiente.');
+                    throw new Error('El documento ya no pudo restaurarse al estado pendiente.');
                 }
             } catch (rollbackError) {
                 console.error('No se pudo restaurar el estado pendiente tras fallar la notificación:', rollbackError);

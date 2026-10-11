@@ -11,8 +11,9 @@ export class NotificationDeliveryError extends Error {
     }
 }
 
-interface OrderRejectionNotification {
+interface RejectionNotification {
     idImagen: string;
+    tipo: 'Orden' | 'Receta';
     nombrePaciente: string;
     nombreMedico: string;
     motivo: string;
@@ -89,7 +90,7 @@ export default class EmailService {
         });
     }
 
-    public async getOrderRejectionNames(pacienteDni: string): Promise<{
+    public async getPatientAndDoctorNames(pacienteDni: string): Promise<{
         nombrePaciente: string;
         nombreMedico: string;
     }> {
@@ -107,36 +108,78 @@ export default class EmailService {
         return { nombrePaciente, nombreMedico };
     }
 
-    public async sendOrderRejectedNotification({
-        idImagen,
-        nombrePaciente,
-        nombreMedico,
-        motivo
-    }: OrderRejectionNotification): Promise<void> {
+    public async sendDoctorCancelledAppointmentNotification(
+        nombrePaciente: string,
+        nombreMedico: string,
+    ): Promise<void> {
         const safePaciente = escapeHtml(nombrePaciente);
         const safeMedico = escapeHtml(nombreMedico);
-        const safeMotivo = escapeHtml(motivo);
+        const message =
+            `Le informamos que su turno médico ha sido cancelado por el profesional ${nombreMedico}.`;
+        const htmlMessage =
+            `Le informamos que su turno médico ha sido cancelado por el profesional <strong>${safeMedico}</strong>.`;
+        const nextStepMessage = 'Por favor, ingrese a la aplicación para volver a solicitar un turno.';
 
         await this.sendBrandedEmail({
-            subject: 'Orden Rechazada',
+            subject: 'Turno Cancelado',
             text: [
                 `Estimado/a ${nombrePaciente}:`,
-                `Le informamos que su orden médica ha sido rechazada por el profesional ${nombreMedico}.`,
-                `Motivo del rechazo: ${motivo}.`,
-                'Por favor, ingrese a la aplicación para solucionar el inconveniente y volver a cargar su orden.',
+                message,
+                nextStepMessage,
                 'Saludos cordiales,',
                 'Equipo de Turnami.'
             ].join('\n\n'),
             content: `
                 <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
-                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">Le informamos que su orden médica ha sido rechazada por el profesional <strong>${safeMedico}</strong>.</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">${htmlMessage}</p>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">${nextStepMessage}</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>`
+        });
+    }
+
+    public async sendRejectionNotification({
+        idImagen,
+        tipo,
+        nombrePaciente,
+        nombreMedico,
+        motivo
+    }: RejectionNotification): Promise<void> {
+        const safePaciente = escapeHtml(nombrePaciente);
+        const safeMedico = escapeHtml(nombreMedico);
+        const safeMotivo = escapeHtml(motivo);
+        const isOrder = tipo === 'Orden';
+        const documentName = isOrder ? 'orden' : 'receta';
+        const subject = isOrder ? 'Orden Rechazada' : 'Receta Rechazada';
+        const rejectionMessage = isOrder
+            ? `Le informamos que su orden médica ha sido rechazada por el profesional ${nombreMedico}.`
+            : `Le informamos que su receta del medicamento ha sido rechazada por el profesional ${nombreMedico}.`;
+        const htmlRejectionMessage = isOrder
+            ? `Le informamos que su orden médica ha sido rechazada por el profesional <strong>${safeMedico}</strong>.`
+            : `Le informamos que su receta del medicamento ha sido rechazada por el profesional <strong>${safeMedico}</strong>.`;
+        const nextStepMessage = isOrder
+            ? 'Por favor, ingrese a la aplicación para solucionar el inconveniente y volver a cargar su orden.'
+            : 'Por favor, ingrese a la aplicación para solucionar el inconveniente y volver a cargar su receta.';
+
+        await this.sendBrandedEmail({
+            subject,
+            text: [
+                `Estimado/a ${nombrePaciente}:`,
+                rejectionMessage,
+                `Motivo del rechazo: ${motivo}.`,
+                nextStepMessage,
+                'Saludos cordiales,',
+                'Equipo de Turnami.'
+            ].join('\n\n'),
+            content: `
+                <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#334155;">${htmlRejectionMessage}</p>
                 <div style="margin:22px 0;padding:16px 18px;border-left:4px solid #3153a2;border-radius:8px;background:#eff5ff;">
                     <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#3153a2;">Motivo del rechazo</p>
                     <p style="margin:0;font-size:15px;line-height:1.6;color:#263449;white-space:pre-wrap;">${safeMotivo}</p>
                 </div>
-                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">Por favor, ingrese a la aplicación para solucionar el inconveniente y volver a cargar su orden.</p>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#334155;">${nextStepMessage}</p>
                 <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">Saludos cordiales,<br><strong style="color:#14264b;">Equipo de Turnami.</strong></p>
-                <p style="margin:22px 0 0;font-size:12px;color:#64748b;">Referencia de orden: ${escapeHtml(idImagen)}</p>`
+                <p style="margin:22px 0 0;font-size:12px;color:#64748b;">Referencia de ${documentName}: ${escapeHtml(idImagen)}</p>`
         });
     }
 
@@ -186,9 +229,9 @@ export default class EmailService {
             });
 
             if (error) {
-                console.error('Resend no pudo enviar la notificación de rechazo:', error);
+                console.error('Resend no pudo enviar la notificación:', error);
                 throw new NotificationDeliveryError(
-                    'No se pudo enviar el correo de notificación. La orden continúa pendiente.'
+                    'No se pudo enviar el correo de notificación.'
                 );
             }
         } catch (error) {
@@ -197,7 +240,7 @@ export default class EmailService {
             }
             console.error('Falló la conexión con Resend:', error);
             throw new NotificationDeliveryError(
-                'No se pudo enviar el correo de notificación. La orden continúa pendiente.'
+                'No se pudo enviar el correo de notificación.'
             );
         }
     }

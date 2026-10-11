@@ -9,6 +9,7 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
   const [modalFeedback, setModalFeedback] = useState({
     status: null,
     message: '',
+    title: '',
   });
 
   const handleClickCancelar = (turno) => {
@@ -20,8 +21,8 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
   };
 
   const handleConfirmarCancelacion = async ()=>{
-    const {_id } = turnoAConfirmar;
-    setTurnoAConfirmar(null);
+    if (!turnoAConfirmar) return;
+    const { _id } = turnoAConfirmar;
 
     if (!onCancelarTurno) return;
 
@@ -32,17 +33,34 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
 
     try {
       await onCancelarTurno(_id);
+      setTurnoAConfirmar(null);
       setModalFeedback({
         status: 'Ok',
-        message: 'Turno cancelado exitosamente.',
+        title: 'Operación completada',
+        message: 'Se envió la notificación correspondiente vía mail al paciente.',
       });
     } catch (error) {
       setModalFeedback({
         status: 'Fallo',
-        message: error?.message || 'Error al cancelar el turno.',
+        title: 'Ocurrió un error',
+        message: 'No se pudo enviar la notificación correspondiente vía mail al paciente, por favor reintente.',
       });
     }
   }
+
+  const handleCloseFeedback = () => {
+    setModalFeedback({ status: null, message: '', title: '' });
+    setTurnoAConfirmar(null);
+  };
+
+  const handleRetryCancelation = () => {
+    setModalFeedback({
+      status: 'Cargando',
+      message: 'Procesando la cancelación...',
+      title: '',
+    });
+    handleConfirmarCancelacion();
+  };
 
   const obtenerClaseBadge = (estado) => {
     switch (estado?.toUpperCase()) {
@@ -52,12 +70,6 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
         return "turno-badge badge-cancelado";
       default:
         return "turno-badge badge-pendiente";
-    }
-  };
-
-  const handleCancelar = (turno) => {
-    if (onCancelarTurno) {
-      onCancelarTurno(turno);
     }
   };
 
@@ -143,8 +155,10 @@ export default function TurnoTable({ turnos = [], onCancelarTurno }) {
 
       <Modal
         status={modalFeedback.status}
+        title={modalFeedback.title}
         message={modalFeedback.message}
-        onClose={() => setModalFeedback({ status: null, message: '' })}
+        onClose={modalFeedback.status === 'Cargando' ? undefined : handleCloseFeedback}
+        onRetry={modalFeedback.status === 'Fallo' ? handleRetryCancelation : undefined}
       />
     </div>
   );

@@ -66,6 +66,19 @@
   font-weight: 700;
 }
 
+.status-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.status-modal-actions button {
+  flex: 1;
+  max-width: 145px;
+  margin-top: 0;
+}
+
 .status-modal-spinner {
   width: 25px;
   height: 25px;

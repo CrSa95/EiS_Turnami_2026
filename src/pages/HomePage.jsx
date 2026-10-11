@@ -231,11 +231,8 @@ function HomePage() {
 
     setState({
       type: States.Ok,
-      message:
-        rejectDocumentType === "Orden"
-          ? "Se envió la notificación correspondiente vía mail al paciente."
-          : `${rejectDocumentType} ha sido rechazada correctamente.`,
-      persistent: rejectDocumentType === "Orden",
+      message: "Se envió la notificación correspondiente vía mail al paciente.",
+      persistent: true,
     });
   };
 
