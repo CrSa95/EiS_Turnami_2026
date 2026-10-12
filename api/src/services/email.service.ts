@@ -50,18 +50,18 @@ export default class EmailService {
     public async sendTranscribedRecipeAccept(receta: IImage){
         const paciente = await this.pacienteDAO.findByDNI(receta.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
-        const recetaId = paciente?.idImagen?.toString() || 'Receta';
+        const recetaId = receta?.idImagen?.toString() || 'Receta';
         const safeRecetaId = escapeHtml(recetaId)
         const safePaciente = escapeHtml(nombrePaciente);
         return await this.sendBrandedEmail({
             subject: "Receta Transcripta",
             text: [
-                `Estimado/a ${nombrePaciente}`,
+                `Estimado/a ${nombrePaciente}:`,
                 "Le informamos que su receta del medicamento fue transcripta con éxito.",
                 "Puede acercarse a su farmacia más cercana para comprar su medicamento con cobertura de PAMI",
                 "Saludos cordiales,",
                 "Equipo de Turnami",
-                `Referencia de Orden: ${recetaId}`
+                `Referencia de Receta: ${recetaId}`
             ].join('\n\n'),
             content: `
                 <p style="margin:0 0 18px;font-size:16px;color:#14264b;">Estimado/a <strong>${safePaciente}</strong>:</p>
@@ -76,7 +76,7 @@ export default class EmailService {
     public async sendTranscribedOrder(orden: IImage): Promise<void> {
         const paciente = await this.pacienteDAO.findByDNI(orden.pacienteDni);
         const nombrePaciente = paciente?.nombre || 'Paciente';
-        const ordenId = paciente?.idImagen?.toString() || 'Orden';
+        const ordenId = orden?.idImagen?.toString() || 'Orden';
         const safePaciente = escapeHtml(nombrePaciente);
         const safeOrdenId = escapeHtml(ordenId)
 
